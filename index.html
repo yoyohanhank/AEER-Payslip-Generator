@@ -332,39 +332,14 @@
         <div>
           <!-- KOP SURAT / HEADER AEER -->
           <header class="flex items-start gap-4 pb-3.5 border-b-[2.5px] border-[#0f2942]">
-            <!-- Container Logo (Default SVG Bumi/Atmosfer AEER atau Gambar Upload) -->
-            <div id="logoContainer" class="w-[74px] h-[74px] shrink-0 rounded-sm overflow-hidden bg-black flex items-center justify-center border border-slate-300">
-              <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <radialGradient id="earthGlow" cx="50%" cy="85%" r="65%">
-                    <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
-                    <stop offset="45%" stop-color="#0284c7" stop-opacity="0.7" />
-                    <stop offset="78%" stop-color="#0f2942" stop-opacity="0.35" />
-                    <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-                  </radialGradient>
-                  <linearGradient id="horizonRim" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#0284c7" stop-opacity="0.2" />
-                    <stop offset="50%" stop-color="#e0f2fe" stop-opacity="1" />
-                    <stop offset="100%" stop-color="#0284c7" stop-opacity="0.2" />
-                  </linearGradient>
-                </defs>
-                <!-- Latar Hitam Luar Angkasa -->
-                <rect width="120" height="120" fill="#030712" />
-                <!-- Bintang-bintang halus -->
-                <circle cx="22" cy="24" r="1" fill="#ffffff" opacity="0.7" />
-                <circle cx="48" cy="18" r="0.8" fill="#ffffff" opacity="0.5" />
-                <circle cx="88" cy="28" r="1.1" fill="#ffffff" opacity="0.8" />
-                <circle cx="98" cy="15" r="0.7" fill="#ffffff" opacity="0.5" />
-                <circle cx="34" cy="40" r="0.7" fill="#bae6fd" opacity="0.6" />
-                <circle cx="76" cy="42" r="0.8" fill="#ffffff" opacity="0.5" />
-                <!-- Atmosfer Glow -->
-                <circle cx="60" cy="128" r="76" fill="url(#earthGlow)" />
-                <!-- Lengkung Planet Bumi -->
-                <circle cx="60" cy="134" r="72" fill="#062138" stroke="url(#horizonRim)" stroke-width="2.5" />
-                <!-- Teks AEER -->
-                <text x="60" y="96" text-anchor="middle" fill="#f8fafc" font-family="Georgia, serif" font-weight="bold" font-size="22" letter-spacing="2">AEER</text>
-                <text x="60" y="109" text-anchor="middle" fill="#bae6fd" font-family="Arial, sans-serif" font-size="4.3" letter-spacing="0.4">AKSI EKOLOGI DAN EMANSIPASI RAKYAT</text>
-              </svg>
+            <!-- Container Logo: Otomatis memanggil ./logo-aeer.jpg dengan fallback SVG resmi -->
+            <div id="logoContainer" class="w-[78px] h-[78px] shrink-0 rounded-sm overflow-hidden bg-black flex items-center justify-center border border-slate-300">
+              <img
+                src="./logo-aeer.jpg"
+                alt="AEER Logo"
+                class="w-full h-full object-cover"
+                onerror="this.onerror=null; this.parentElement.innerHTML=defaultLogoHTML;"
+              />
             </div>
 
             <!-- Teks Kop Surat Resmi -->
@@ -376,16 +351,16 @@
                 Talavera Office Park 28 floor Jl. T.B. Simatupang, Kav 22-26 Jakarta 12430 Indonesia
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Telephone : 021-75999928 &nbsp;Faximile 021-75999988
+                Telephone : 021-75999928 Faximile 021-75999888
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Email : info@aeer.or.id &nbsp;http://aeer.or.id
+                Email : info@aeer.or.id http://aeer.or.id
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Legality : Decision of Ministry Law and Human Rights of Republic of Indonesia
+                Legality :Decision of Ministry Law and Human Rights of Republic of Indonesia
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Number : AHU-0008978.AH.01.07.Tahun 2017
+                Number :AHU-0008978.AH.01.07.Tahun 2017
               </p>
             </div>
           </header>
@@ -589,8 +564,36 @@
   </main>
 
   <script>
-    // Simpan SVG default untuk fitur reset logo
-    const defaultLogoHTML = document.getElementById('logoContainer').innerHTML;
+    // Simpan SVG fallback jika ./logo-aeer.jpg belum ditemukan di local preview
+    const defaultLogoHTML = `
+      <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="earthGlow" cx="50%" cy="85%" r="65%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#0284c7" stop-opacity="0.7" />
+            <stop offset="78%" stop-color="#0f2942" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="horizonRim" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0284c7" stop-opacity="0.2" />
+            <stop offset="50%" stop-color="#e0f2fe" stop-opacity="1" />
+            <stop offset="100%" stop-color="#0284c7" stop-opacity="0.2" />
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" fill="#030712" />
+        <circle cx="22" cy="24" r="1" fill="#ffffff" opacity="0.7" />
+        <circle cx="48" cy="18" r="0.8" fill="#ffffff" opacity="0.5" />
+        <circle cx="88" cy="28" r="1.1" fill="#ffffff" opacity="0.8" />
+        <circle cx="98" cy="15" r="0.7" fill="#ffffff" opacity="0.5" />
+        <circle cx="34" cy="40" r="0.7" fill="#bae6fd" opacity="0.6" />
+        <circle cx="76" cy="42" r="0.8" fill="#ffffff" opacity="0.5" />
+        <circle cx="60" cy="128" r="76" fill="url(#earthGlow)" />
+        <circle cx="60" cy="134" r="72" fill="#062138" stroke="url(#horizonRim)" stroke-width="2.5" />
+        <text x="60" y="96" text-anchor="middle" fill="#f8fafc" font-family="Georgia, serif" font-weight="bold" font-size="22" letter-spacing="2">AEER</text>
+        <text x="60" y="109" text-anchor="middle" fill="#bae6fd" font-family="Arial, sans-serif" font-size="4.3" letter-spacing="0.4">AKSI EKOLOGI DAN EMANSIPASI RAKYAT</text>
+      </svg>
+    `;
+    const initialLogoContainerHTML = document.getElementById('logoContainer').innerHTML;
 
     // Format angka ke Rupiah Indonesia
     function formatIDR(num) {
@@ -846,10 +849,10 @@
     }
 
     function resetLogo() {
-      document.getElementById('logoContainer').innerHTML = defaultLogoHTML;
+      document.getElementById('logoContainer').innerHTML = initialLogoContainerHTML;
       document.getElementById('logoUpload').value = '';
       document.getElementById('btnResetLogo').classList.add('hidden');
-      showToast('Logo dikembalikan ke default.');
+      showToast('Logo dikembalikan ke ./logo-aeer.jpg.');
     }
 
     // Reset semua input ke data awal
