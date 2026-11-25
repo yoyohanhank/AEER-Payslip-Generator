@@ -28,7 +28,7 @@
       min-height: 297mm;
       background: #ffffff;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-      padding: 16mm 18mm;
+      padding: 14mm 16mm;
       margin: 0 auto;
       position: relative;
       box-sizing: border-box;
@@ -53,6 +53,8 @@
         background: #ffffff !important;
         margin: 0 !important;
         padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
 
       .no-print {
@@ -71,7 +73,7 @@
         min-height: 297mm !important;
         box-shadow: none !important;
         margin: 0 !important;
-        padding: 15mm 17mm !important;
+        padding: 13mm 15mm !important;
         page-break-after: avoid;
       }
     }
@@ -90,7 +92,7 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-bold tracking-tight">AEER Payslip Generator</h1>
-          <p class="text-xs text-slate-300">Siap GitHub Pages • Single-File Web App &amp; Cetak PDF A4</p>
+          <p class="text-xs text-slate-300">Sistem Slip Gaji Kehadiran, Prorata, Benefit BPJS &amp; Hak PL/LP</p>
         </div>
       </div>
 
@@ -108,7 +110,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          Cetak / Simpan PDF
+          Print / Save as PDF
         </button>
       </div>
     </div>
@@ -127,196 +129,176 @@
     <section class="no-print xl:col-span-5 space-y-5 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
       <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
         <div>
-          <h2 class="text-base font-bold text-[#0f2942]">Editor Data Payslip</h2>
+          <h2 class="text-base font-bold text-[#0f2942]">Input Data Payslip</h2>
           <p class="text-xs text-slate-500">Perubahan langsung memperbarui pratinjau A4 di kanan</p>
         </div>
         <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-[#0284c7] border border-sky-200">Live Sync</span>
       </div>
 
-      <!-- 1. Logo Kustom Opsional -->
-      <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700">Logo Kop Surat AEER</label>
-            <p class="text-[11px] text-slate-500">Gunakan logo bawaan atau unggah file gambar asli (PNG/JPG)</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="px-3 py-1.5 text-xs font-medium bg-white border border-slate-300 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-700">
-              Upload Logo
-              <input type="file" id="logoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)" />
-            </label>
-            <button type="button" id="btnResetLogo" onclick="resetLogo()" class="hidden px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 cursor-pointer">
-              Reset
-            </button>
-          </div>
+      <!-- Logo Kustom Opsional -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between gap-2">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700">Logo Kop Surat AEER</label>
+          <p class="text-[11px] text-slate-500">Default memuat <code class="text-slate-700">./logo-aeer.jpg</code> atau upload manual</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <label class="px-3 py-1.5 text-xs font-medium bg-white border border-slate-300 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-700">
+            Upload Logo
+            <input type="file" id="logoUpload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)" />
+          </label>
+          <button type="button" id="btnResetLogo" onclick="resetLogo()" class="hidden px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 cursor-pointer">
+            Reset
+          </button>
         </div>
       </div>
 
-      <!-- 2. Identitas Karyawan -->
+      <!-- 1. Identitas Karyawan & Penyetuju -->
       <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan &amp; Koordinator</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Nama Karyawan</label>
-            <input type="text" id="empName" value="Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] outline-none" />
+            <input type="text" id="empName" value="Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan / Posisi</label>
-            <input type="text" id="empTitle" value="Senior Operation and People Manager" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] outline-none" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan</label>
+            <input type="text" id="empTitle" value="Senior Operation and People Manager" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">NIK / Employee ID</label>
-            <input type="text" id="empId" value="AEER-2026-1106" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] outline-none" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">NIK / ID Karyawan</label>
+            <input type="text" id="empId" value="AEER-2026-011" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">NPWP</label>
-            <input type="text" id="empNpwp" placeholder="00.000.000.0-000.000" value="-" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] focus:border-[#0284c7] outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Status PTKP (Pajak)</label>
-            <select id="empPtkp" onchange="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none">
-              <option value="TK/0">TK/0 (Tidak Kawin, 0 Tanggungan - TER A)</option>
-              <option value="TK/1">TK/1 (Tidak Kawin, 1 Tanggungan - TER A)</option>
-              <option value="K/0">K/0 (Kawin, 0 Tanggungan - TER A)</option>
-              <option value="TK/2">TK/2 (Tidak Kawin, 2 Tanggungan - TER B)</option>
-              <option value="TK/3">TK/3 (Tidak Kawin, 3 Tanggungan - TER B)</option>
-              <option value="K/1">K/1 (Kawin, 1 Tanggungan - TER B)</option>
-              <option value="K/2">K/2 (Kawin, 2 Tanggungan - TER B)</option>
-              <option value="K/3" selected>K/3 (Kawin, 3 Tanggungan - TER B)</option>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Status Pajak (PTKP)</label>
+            <select id="empPtkp" onchange="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none">
+              <option value="TK/0">TK/0 (TER Kategori A)</option>
+              <option value="TK/1">TK/1 (TER Kategori A)</option>
+              <option value="K/0">K/0 (TER Kategori A)</option>
+              <option value="TK/2">TK/2 (TER Kategori B)</option>
+              <option value="TK/3">TK/3 (TER Kategori B)</option>
+              <option value="K/1">K/1 (TER Kategori B)</option>
+              <option value="K/2">K/2 (TER Kategori B)</option>
+              <option value="K/3" selected>K/3 (TER Kategori B)</option>
             </select>
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Join Date</label>
-            <input type="date" id="empJoinDate" value="2026-11-06" onchange="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <input type="text" id="empJoinDate" value="6 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-slate-700 mb-1">Rekening Bank Tujuan</label>
-            <input type="text" id="empBank" value="BCA — a.n. Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Periode Cut-off</label>
+            <input type="text" id="payPeriod" value="26 Oktober – 25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Rekening Bank</label>
+            <input type="text" id="empBank" value="BCA - a.n. Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Nama Koordinator (Penyetuju)</label>
+            <input type="text" id="approverName" value="Pius Ginting" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
         </div>
       </div>
 
-      <!-- 3. Periode & Prorata -->
+      <!-- 2. Input Kehadiran, Cuti/Sakit, Mangkir & PL/LP -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">2. Periode Cut-Off &amp; Prorata</h3>
-          <label class="inline-flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" id="prorataActive" checked onchange="onPtkpOrIncomeChange()" class="w-4 h-4 accent-[#0284c7] rounded" />
-            <span class="text-xs font-semibold text-slate-700">Aktifkan Prorata</span>
-          </label>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">2. Data Kehadiran &amp; Hari Kerja</h3>
+          <span class="text-[11px] font-medium text-slate-500">Dasar Prorata &amp; Potongan Absensi</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-sky-50/70 p-3.5 rounded-xl border border-sky-200">
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Periode Cut-Off</label>
-            <input type="text" id="payPeriod" value="26 Oktober 2026 – 25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Total Hari Kerja Periode</label>
+            <input type="number" id="totalDays" value="23" min="1" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Pembayaran</label>
-            <input type="text" id="payDate" value="25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Hari Hadir</label>
+            <input type="number" id="presentDays" value="14" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-emerald-700" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Cuti / Sakit</label>
+            <input type="number" id="leaveDays" value="0" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-700" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Mangkir</label>
+            <input type="number" id="absentDays" value="0" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-rose-700" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah PL / LP (Pengganti Libur - Weekend)</label>
+            <input type="number" id="plDays" value="0" min="0" max="15" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-[#0284c7]" />
           </div>
         </div>
 
-        <div id="prorataBox" class="grid grid-cols-3 gap-2.5 bg-sky-50/70 p-3 rounded-xl border border-sky-200">
-          <div>
-            <label class="block text-[11px] font-medium text-slate-700 mb-1">Hari Kerja Aktif</label>
-            <input type="number" id="activeDays" value="14" min="1" max="31" oninput="onPtkpOrIncomeChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-700 mb-1">Total Hari Kerja</label>
-            <input type="number" id="totalDays" value="23" min="1" max="31" oninput="onPtkpOrIncomeChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-700 mb-1">Rasio Prorata</label>
-            <div id="prorataRatioDisplay" class="w-full px-2.5 py-1.5 text-sm font-bold text-[#0f2942] bg-white rounded-lg border border-slate-200 text-center">
-              60.87%
-            </div>
-          </div>
+        <!-- Ringkasan Kaidah Hitung Real-Time -->
+        <div class="text-[11px] text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1 leading-relaxed" id="attendanceFormulaSummary">
+          <div>• <strong>Komponen Tetap</strong> (Gaji Dasar, Tj. Posisi, Tj. Rumah): dibayar untuk <strong class="text-slate-900">14 hari</strong> (Hadir + Cuti/Sakit − Mangkir) dari 23 hari kerja.</div>
+          <div>• <strong>Tunjangan Harian</strong> (Tj. Transport &amp; Tj. Kehadiran): dibayar untuk <strong class="text-slate-900">14 hari</strong> (Hadir − Mangkir; hari Cuti/Sakit tidak mendapat tunjangan ini).</div>
         </div>
       </div>
 
-      <!-- 4. Komponen Earnings (Nilai Full Bulanan) -->
+      <!-- 3. Komponen Gaji & Benefit (Rate Bulanan Penuh) -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">3. Earnings (Nilai Full Bulanan - Rp)</h3>
-          <span class="text-[11px] text-slate-500">Otomatis diprorata jika aktif</span>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">3. Gaji &amp; Benefit Bulanan (Full Rate - Rp)</h3>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Base Salary</label>
-            <input type="number" id="baseSalary" value="23850000" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Gaji Dasar / Base Salary</label>
+            <input type="number" id="baseSalary" value="23850000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Positional Allowance</label>
-            <input type="number" id="posAllowance" value="5000000" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Posisi / Positional</label>
+            <input type="number" id="posAllowance" value="5000000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Transport Allowance</label>
-            <input type="number" id="transAllowance" value="1500000" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Rumah / Housing</label>
+            <input type="number" id="housingAllowance" value="0" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Attendance Allowance</label>
-            <input type="number" id="attAllowance" value="1500000" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Transport / Transport</label>
+            <input type="number" id="transAllowance" value="1500000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Housing Allowance</label>
-            <input type="number" id="housingAllowance" value="0" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Kehadiran / Attendance</label>
+            <input type="number" id="attAllowance" value="1500000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">BPJS Kes by Company</label>
-            <input type="number" id="bpjsCompany" value="0" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-medium text-slate-700 mb-1">Jaminan Pensiun by Company</label>
-            <input type="number" id="jpCompany" value="0" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. Komponen Deductions & Pajak -->
-      <div class="space-y-3 pt-2 border-t border-slate-200">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">4. Deductions &amp; PPh 21</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-medium text-slate-700">BPJS Kes by Employee</label>
+              <label class="text-xs font-medium text-emerald-800">Tunjangan BPJS Kes (Benefit)</label>
               <label class="inline-flex items-center gap-1 text-[11px] text-slate-600 cursor-pointer">
-                <input type="checkbox" id="prorataBpjs" checked onchange="onPtkpOrIncomeChange()" class="accent-[#0284c7]" />
+                <input type="checkbox" id="prorataBpjsBenefit" onchange="onFormulaInputChange()" class="accent-[#0284c7]" />
                 Prorata
               </label>
             </div>
-            <input type="number" id="bpjsEmployee" value="150000" step="1000" oninput="onPtkpOrIncomeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <input type="number" id="bpjsBenefit" value="150000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-emerald-300 bg-emerald-50/40 font-medium" />
           </div>
+        </div>
+      </div>
 
+      <!-- 4. Deductions & PPh 21 -->
+      <div class="space-y-3 pt-2 border-t border-slate-200">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">4. Deductions (PPh 21 &amp; Potongan Lain)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-medium text-slate-700">Regular Tax / PPh 21 (Rp)</label>
+              <label class="text-xs font-medium text-slate-700">PPh 21 (TER Kategori B / Manual)</label>
               <label class="inline-flex items-center gap-1 text-[11px] text-slate-600 cursor-pointer">
-                <input type="checkbox" id="autoTax" checked onchange="onPtkpOrIncomeChange()" class="accent-[#0284c7]" />
+                <input type="checkbox" id="autoTax" checked onchange="onFormulaInputChange()" class="accent-[#0284c7]" />
                 Auto TER
               </label>
             </div>
-            <input type="number" id="regularTax" value="1259652" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 font-semibold text-slate-800" />
+            <input type="number" id="regularTax" value="1269404" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 font-semibold text-slate-800" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Potongan Lainnya (Rp)</label>
+            <input type="number" id="otherDeduction" value="0" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
         </div>
         <p class="text-[11px] text-slate-500 leading-relaxed">
-          *Jika <strong>Auto TER</strong> aktif, PPh 21 menghitung estimasi tarif efektif bulanan sesuai PTKP &amp; Bruto (saat Full Rp32jt menggunakan Rp3.840.000 sesuai offering letter; saat Prorata 14/23 menggunakan estimasi TER B 6,5% = Rp1.259.652). Hapus centang jika ingin input angka manual dari Finance.
+          *BPJS Kesehatan dimasukkan sebagai <strong>Benefit (Earnings)</strong> karena kepesertaan mandiri oleh karyawan, sehingga tidak mengurangi THP. PPh 21 dihitung otomatis menggunakan tarif efektif bulanan (PMK 168/2023) atau dapat diinput manual dengan menghapus centang <em>Auto TER</em>.
         </p>
-      </div>
-
-      <!-- 6. Pengesahan / Tanda Tangan -->
-      <div class="space-y-3 pt-2 border-t border-slate-200">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">5. Pengesahan Dokumen</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Nama Pejabat Mengesahkan</label>
-            <input type="text" id="approverName" value="Pius Ginting" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan Pejabat</label>
-            <input type="text" id="approverTitle" value="Koordinator AEER" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
-          </div>
-        </div>
       </div>
     </section>
 
@@ -324,15 +306,14 @@
     <section class="print-container xl:col-span-7 preview-wrapper flex flex-col items-center">
       <div class="no-print w-full max-w-[210mm] mb-2.5 flex items-center justify-between text-xs text-slate-500 px-1">
         <span>Pratinjau Dokumen Resmi (Ukuran Kertas A4)</span>
-        <span>Tip: Klik <strong>Cetak / Simpan PDF</strong> lalu pilih <em>Save as PDF</em></span>
+        <span>Tip: Klik <strong>Print / Save as PDF</strong> lalu pilih <em>Save as PDF</em></span>
       </div>
 
       <!-- KERTAS A4 -->
       <article class="a4-sheet text-slate-800 flex flex-col justify-between" id="payslipDocument">
         <div>
-          <!-- KOP SURAT / HEADER AEER -->
-          <header class="flex items-start gap-4 pb-3.5 border-b-[2.5px] border-[#0f2942]">
-            <!-- Container Logo: Otomatis memanggil ./logo-aeer.jpg dengan fallback SVG resmi -->
+          <!-- 1. KOP SURAT / HEADER RESMI AEER -->
+          <header class="flex items-start gap-4 pb-3 border-b-[2.5px] border-[#0f2942]">
             <div id="logoContainer" class="w-[78px] h-[78px] shrink-0 rounded-sm overflow-hidden bg-black flex items-center justify-center border border-slate-300">
               <img
                 src="./logo-aeer.jpg"
@@ -342,9 +323,8 @@
               />
             </div>
 
-            <!-- Teks Kop Surat Resmi -->
             <div class="flex-1 leading-snug">
-              <h1 class="font-serif-header text-[17.5px] font-bold text-[#334155] tracking-tight leading-tight">
+              <h1 class="font-serif-header text-[17.5px] font-bold text-[#1e293b] tracking-tight leading-tight">
                 Aksi Ekologi dan Emansipasi Rakyat (AEER)
               </h1>
               <p class="text-[10.5px] text-slate-600 mt-1">
@@ -357,25 +337,20 @@
                 Email : info@aeer.or.id http://aeer.or.id
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Legality :Decision of Ministry Law and Human Rights of Republic of Indonesia
-              </p>
-              <p class="text-[10.5px] text-slate-600">
-                Number :AHU-0008978.AH.01.07.Tahun 2017
+                Legality : Decision of Ministry Law and Human Rights of Republic of Indonesia Number : AHU-0008978.AH.01.07.Tahun 2017
               </p>
             </div>
           </header>
 
           <!-- JUDUL DOKUMEN -->
-          <div class="mt-4 mb-4 flex items-center justify-between bg-[#0f2942] text-white px-4 py-2 rounded-md">
-            <div>
-              <h2 class="text-xs font-bold uppercase tracking-[0.14em]">CONFIDENTIAL PAYSLIP / SLIP GAJI KARYAWAN</h2>
-            </div>
-            <span class="text-[10.5px] font-medium text-sky-200" id="docPeriodBadge">Periode: 26 Okt – 25 Nov 2026</span>
+          <div class="mt-3.5 mb-3.5 flex items-center justify-between bg-[#0f2942] text-white px-4 py-2 rounded-md">
+            <h2 class="text-xs font-bold uppercase tracking-[0.12em]">SLIP GAJI KARYAWAN / EMPLOYEE PAYSLIP</h2>
+            <span class="text-[10.5px] font-medium text-sky-200" id="docPeriodBadge">Periode: 26 Oktober – 25 November 2026</span>
           </div>
 
-          <!-- INFORMASI KARYAWAN & PERIODE KERJA -->
-          <div class="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11px] bg-slate-50 border border-slate-200 rounded-lg p-3.5 mb-4">
-            <div class="space-y-1.5">
+          <!-- 2. IDENTITAS KARYAWAN & PERIODE -->
+          <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] bg-slate-50 border border-slate-200 rounded-lg p-3 mb-3">
+            <div class="space-y-1">
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">Nama Karyawan</span>
                 <span class="mr-2 text-slate-500">:</span>
@@ -389,121 +364,145 @@
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">NIK / ID</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewEmpId">AEER-2026-1106</span>
+                <span class="text-slate-800" id="viewEmpId">AEER-2026-011</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Status PTKP / NPWP</span>
+                <span class="w-28 text-slate-500 shrink-0">Status PTKP</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800"><strong id="viewEmpPtkp">K/3</strong> &nbsp;|&nbsp; <span id="viewEmpNpwp">-</span></span>
+                <span class="font-semibold text-slate-800" id="viewEmpPtkp">K/3</span>
               </div>
             </div>
 
-            <div class="space-y-1.5">
+            <div class="space-y-1">
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">Periode Cut-Off</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="font-semibold text-slate-800" id="viewPayPeriod">26 Oktober 2026 – 25 November 2026</span>
+                <span class="font-semibold text-slate-800" id="viewPayPeriod">26 Oktober – 25 November 2026</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Tanggal Bayar</span>
+                <span class="w-28 text-slate-500 shrink-0">Join Date</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewPayDate">25 November 2026</span>
+                <span class="text-slate-800" id="viewJoinDate">6 November 2026</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Join Date / Kerja</span>
+                <span class="w-28 text-slate-500 shrink-0">Rekening Bank</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewWorkInfo">06 Nov 2026 (Prorata 14/23 hari)</span>
+                <span class="text-slate-800" id="viewEmpBank">BCA - a.n. Yohan Kurniawan</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Transfer Bank</span>
+                <span class="w-28 text-slate-500 shrink-0">Rasio Hari Bayar</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewEmpBank">BCA — a.n. Yohan Kurniawan</span>
+                <span class="text-slate-800" id="viewRatioInfo">14 / 23 Hari Kerja (60,87%)</span>
               </div>
             </div>
           </div>
 
-          <!-- TABEL RINCIAN EARNINGS & DEDUCTIONS -->
-          <div class="border border-slate-300 rounded-lg overflow-hidden mb-4">
+          <!-- 3. RINGKASAN KEHADIRAN & CUTI (ATTENDANCE STRIP) -->
+          <div class="grid grid-cols-5 border border-slate-300 rounded-lg overflow-hidden mb-3.5 text-center text-[10.5px]">
+            <div class="py-1.5 px-2 bg-slate-100 border-r border-slate-300">
+              <div class="text-slate-500 font-medium">Hari Kerja</div>
+              <div class="font-bold text-slate-900 text-xs mt-0.5" id="stripTotalDays">23 Hari</div>
+            </div>
+            <div class="py-1.5 px-2 bg-emerald-50/60 border-r border-slate-300">
+              <div class="text-emerald-700 font-medium">Hadir</div>
+              <div class="font-bold text-emerald-900 text-xs mt-0.5" id="stripPresentDays">14 Hari</div>
+            </div>
+            <div class="py-1.5 px-2 bg-amber-50/60 border-r border-slate-300">
+              <div class="text-amber-700 font-medium">Cuti / Sakit</div>
+              <div class="font-bold text-amber-900 text-xs mt-0.5" id="stripLeaveDays">0 Hari</div>
+            </div>
+            <div class="py-1.5 px-2 bg-rose-50/60 border-r border-slate-300">
+              <div class="text-rose-700 font-medium">Mangkir</div>
+              <div class="font-bold text-rose-900 text-xs mt-0.5" id="stripAbsentDays">0 Hari</div>
+            </div>
+            <div class="py-1.5 px-2 bg-sky-50/80">
+              <div class="text-[#0284c7] font-medium">Hak PL / LP</div>
+              <div class="font-bold text-[#0f2942] text-xs mt-0.5" id="stripPlDays">0 Hari</div>
+            </div>
+          </div>
+
+          <!-- 4. TABEL DUA KOLOM: EARNINGS VS DEDUCTIONS -->
+          <div class="border border-slate-300 rounded-lg overflow-hidden mb-3.5">
             <table class="w-full text-[11px] border-collapse">
               <thead>
                 <tr class="bg-[#0f2942] text-white">
-                  <th class="text-left py-2 px-3 font-semibold w-[33%] border-r border-slate-600">EARNINGS (PENDAPATAN)</th>
-                  <th class="text-right py-2 px-3 font-semibold w-[17%] border-r border-slate-500">AMOUNT (IDR)</th>
-                  <th class="text-left py-2 px-3 font-semibold w-[33%] border-r border-slate-600">DEDUCTIONS (POTONGAN)</th>
-                  <th class="text-right py-2 px-3 font-semibold w-[17%]">AMOUNT (IDR)</th>
+                  <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600">EARNINGS &amp; BENEFITS</th>
+                  <th class="text-right py-2 px-3 font-semibold w-[16%] border-r border-slate-500">AMOUNT (IDR)</th>
+                  <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600">DEDUCTIONS (POTONGAN)</th>
+                  <th class="text-right py-2 px-3 font-semibold w-[16%]">AMOUNT (IDR)</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
                 <!-- Baris 1 -->
                 <tr>
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Base Salary</div>
+                    <div class="font-medium text-slate-800">Gaji Dasar (Base Salary)</div>
                     <div class="text-[9.5px] text-slate-500" id="subBase">Full: Rp 23.850.000 (14/23 hr)</div>
                   </td>
                   <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valBase">Rp 14.517.391</td>
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">BPJS Kesehatan (Employee)</div>
-                    <div class="text-[9.5px] text-slate-500" id="subBpjsEmp">Iuran Peserta (Prorata)</div>
+                    <div class="font-medium text-slate-800">PPh Pasal 21 (Regular Tax)</div>
+                    <div class="text-[9.5px] text-slate-500" id="subTax">Status K/3 (TER Kategori B)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valBpjsEmp">Rp 91.304</td>
+                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valTax">Rp 1.269.404</td>
                 </tr>
 
                 <!-- Baris 2 -->
                 <tr class="bg-slate-50/60">
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Positional Allowance</div>
-                    <div class="text-[9.5px] text-slate-500" id="subPos">Full: Rp 5.000.000</div>
+                    <div class="font-medium text-slate-800">Tunjangan Posisi (Positional)</div>
+                    <div class="text-[9.5px] text-slate-500" id="subPos">Full: Rp 5.000.000 (14/23 hr)</div>
                   </td>
                   <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valPos">Rp 3.043.478</td>
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Regular Tax / PPh 21</div>
-                    <div class="text-[9.5px] text-slate-500" id="subTax">Status K/3 (TER Kategori B)</div>
+                    <div class="font-medium text-slate-800">Potongan Lainnya</div>
+                    <div class="text-[9.5px] text-slate-500">Koreksi / Pinjaman / Lain-lain</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valTax">Rp 1.259.652</td>
+                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valOtherDed">Rp 0</td>
                 </tr>
 
                 <!-- Baris 3 -->
                 <tr>
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Transport Allowance</div>
-                    <div class="text-[9.5px] text-slate-500" id="subTrans">Full: Rp 1.500.000</div>
+                    <div class="font-medium text-slate-800">Tunjangan Rumah (Housing)</div>
+                    <div class="text-[9.5px] text-slate-500" id="subHousing">Full: Rp 0 (14/23 hr)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valTrans">Rp 913.043</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-500">BPJS Kes by Company</td>
-                  <td class="py-2 px-3 text-right text-slate-500 tabular-nums">Rp 0</td>
+                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valHousing">Rp 0</td>
+                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400 italic text-[10px]">
+                    BPJS Kesehatan (Kepesertaan Mandiri)
+                  </td>
+                  <td class="py-2 px-3 text-right text-slate-400 text-[10px]">Non-Deduction</td>
                 </tr>
 
                 <!-- Baris 4 -->
                 <tr class="bg-slate-50/60">
                   <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Attendance Allowance</div>
-                    <div class="text-[9.5px] text-slate-500" id="subAtt">Full: Rp 1.500.000</div>
+                    <div class="font-medium text-slate-800">Tunjangan Transport</div>
+                    <div class="text-[9.5px] text-slate-500" id="subTrans">Full: Rp 1.500.000 (14/23 hr hadir)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valAtt">Rp 913.043</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-500">Jaminan Pensiun by Company</td>
-                  <td class="py-2 px-3 text-right text-slate-500 tabular-nums">Rp 0</td>
+                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valTrans">Rp 913.043</td>
+                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
+                  <td class="py-2 px-3 text-right text-slate-400">-</td>
                 </tr>
 
                 <!-- Baris 5 -->
                 <tr>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-600">Housing Allowance</td>
-                  <td class="py-2 px-3 text-right text-slate-600 border-r border-slate-300 tabular-nums" id="valHousing">Rp 0</td>
+                  <td class="py-2 px-3 border-r border-slate-200">
+                    <div class="font-medium text-slate-800">Tunjangan Kehadiran</div>
+                    <div class="text-[9.5px] text-slate-500" id="subAtt">Full: Rp 1.500.000 (14/23 hr hadir)</div>
+                  </td>
+                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valAtt">Rp 913.043</td>
                   <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
                   <td class="py-2 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- Baris 6 -->
-                <tr class="bg-slate-50/60">
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-600">BPJS Kes by Company</td>
-                  <td class="py-2 px-3 text-right text-slate-600 border-r border-slate-300 tabular-nums" id="valBpjsComp">Rp 0</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
-                  <td class="py-2 px-3 text-right text-slate-400">-</td>
-                </tr>
-
-                <!-- Baris 7 -->
-                <tr>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-600">Jaminan Pensiun by Company</td>
-                  <td class="py-2 px-3 text-right text-slate-600 border-r border-slate-300 tabular-nums" id="valJpComp">Rp 0</td>
+                <!-- Baris 6: BPJS Kesehatan sebagai Benefit -->
+                <tr class="bg-emerald-50/50">
+                  <td class="py-2 px-3 border-r border-slate-200">
+                    <div class="font-semibold text-emerald-900">Tunjangan BPJS Kesehatan (Benefit)</div>
+                    <div class="text-[9.5px] text-emerald-700" id="subBpjsBen">Benefit Kepesertaan Mandiri (Full)</div>
+                  </td>
+                  <td class="py-2 px-3 text-right font-semibold text-emerald-900 border-r border-slate-300 tabular-nums" id="valBpjsBen">Rp 150.000</td>
                   <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
                   <td class="py-2 px-3 text-right text-slate-400">-</td>
                 </tr>
@@ -511,52 +510,67 @@
                 <!-- BARIS TOTAL GROSS -->
                 <tr class="bg-slate-100 font-bold text-[#0f2942] border-t-2 border-slate-300">
                   <td class="py-2.5 px-3 border-r border-slate-200 uppercase">GROSS EARNINGS</td>
-                  <td class="py-2.5 px-3 text-right border-r border-slate-300 tabular-nums" id="valGrossEarnings">Rp 19.386.955</td>
-                  <td class="py-2.5 px-3 border-r border-slate-200 uppercase">GROSS DEDUCTIONS</td>
-                  <td class="py-2.5 px-3 text-right text-rose-700 tabular-nums" id="valGrossDeductions">Rp 1.350.956</td>
+                  <td class="py-2.5 px-3 text-right border-r border-slate-300 tabular-nums" id="valGrossEarnings">Rp 19.536.955</td>
+                  <td class="py-2.5 px-3 border-r border-slate-200 uppercase">TOTAL DEDUCTIONS</td>
+                  <td class="py-2.5 px-3 text-right text-rose-700 tabular-nums" id="valGrossDeductions">Rp 1.269.404</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- KOTAK SUMMARY TOTAL NET PAY (TAKE-HOME PAY) -->
-          <div class="bg-[#0f2942] text-white rounded-lg p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <!-- 5. KOTAK SUMMARY TOTAL NET PAY (TAKE-HOME PAY) -->
+          <div class="bg-[#0f2942] text-white rounded-lg p-3.5 mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <div class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold">TOTAL NET PAY (TAKE-HOME PAY)</div>
-              <div class="text-[11px] text-slate-200 italic mt-0.5" id="valTerbilang">
-                Terbilang: Delapan Belas Juta Tiga Puluh Lima Ribu Sembilan Ratus Sembilan Puluh Sembilan Rupiah
+              <div class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold">NET TAKE-HOME PAY (THP DITERIMA)</div>
+              <div class="text-[10.5px] text-slate-200 italic mt-0.5" id="valTerbilang">
+                Terbilang: Delapan Belas Juta Dua Ratus Enam Puluh Tujuh Ribu Lima Ratus Lima Puluh Satu Rupiah
               </div>
             </div>
             <div class="text-right shrink-0">
-              <div class="text-xl font-bold tracking-tight tabular-nums text-white" id="valNetPay">Rp 18.035.999</div>
+              <div class="text-xl font-bold tracking-tight tabular-nums text-white" id="valNetPay">Rp 18.267.551</div>
             </div>
           </div>
 
-          <!-- CATATAN KAKI PERHITUNGAN -->
-          <div class="text-[10px] text-slate-500 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-6 leading-relaxed" id="docFootnote">
-            <strong>Catatan Perhitungan:</strong> Gaji dan tunjangan dihitung secara prorata berdasarkan hari kerja efektif sejak tanggal bergabung (6 November 2026) hingga tanggal cut-off (25 November 2026), yaitu <strong>14 hari kerja dari total 23 hari kerja</strong> (60,87%). Pemotongan PPh Pasal 21 mengacu pada ketentuan Tarif Efektif Bulanan (TER) sesuai status PTKP karyawan.
+          <!-- 6. KOTAK HAK PENGGANTI LIBUR (PL / LP) -->
+          <div id="plEntitlementBox" class="bg-sky-50 border border-sky-300 rounded-lg px-3.5 py-2.5 mb-3 flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-[#0284c7] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+              PL
+            </div>
+            <div class="text-[10.5px] text-slate-800 leading-snug">
+              <div class="font-bold text-[#0f2942]">Catatan Hak Pengganti Libur (PL / LP):</div>
+              <p id="plEntitlementText">
+                Karyawan berhak atas <strong>0 hari Pengganti Libur (PL/LP)</strong> pada bulan berjalan atas kehadiran di hari akhir pekan (weekend).
+              </p>
+            </div>
+          </div>
+
+          <!-- 7. KETERANGAN RINCIAN POTONGAN KEHADIRAN -->
+          <div class="text-[9.5px] text-slate-600 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-4 leading-relaxed" id="docFootnote">
+            <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (14/23 hari) serta dipotong proporsional untuk hari mangkir (0 hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir aktual (14/23 hari; hari cuti/sakit &amp; mangkir tidak memperoleh tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan sebagai benefit mandiri.
           </div>
         </div>
 
-        <!-- BLOK TANDA TANGAN & PENGESAHAN -->
-        <div>
-          <div class="grid grid-cols-2 gap-12 text-[11px] text-slate-700 pt-2">
+        <!-- 8. BLOK TANDA TANGAN DUA KOLOM (KOORDINATOR & KARYAWAN) -->
+        <div class="pt-1">
+          <div class="grid grid-cols-2 gap-12 text-[11px] text-slate-700">
             <div class="text-center">
-              <p class="text-slate-500 mb-14">Disetujui &amp; Disahkan oleh,</p>
-              <div class="w-48 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewApproverName">Pius Ginting</div>
-              <p class="text-[10px] text-slate-500 mt-0.5" id="viewApproverTitle">Koordinator AEER</p>
+              <p class="text-slate-600 font-medium">Disetujui oleh,</p>
+              <p class="text-[10px] text-slate-500 mb-14">Koordinator AEER</p>
+              <div class="w-52 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewApproverName">Pius Ginting</div>
+              <p class="text-[10px] text-slate-500 mt-0.5">Koordinator AEER</p>
             </div>
 
             <div class="text-center">
-              <p class="text-slate-500 mb-14">Diterima oleh,</p>
-              <div class="w-48 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewReceiverName">Yohan Kurniawan</div>
+              <p class="text-slate-600 font-medium">Diterima oleh,</p>
+              <p class="text-[10px] text-slate-500 mb-14">Karyawan</p>
+              <div class="w-52 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewReceiverName">Yohan Kurniawan</div>
               <p class="text-[10px] text-slate-500 mt-0.5" id="viewReceiverTitle">Senior Operation and People Manager</p>
             </div>
           </div>
 
-          <div class="mt-6 pt-2 border-t border-slate-200 flex items-center justify-between text-[9.5px] text-slate-400">
-            <span>Dokumen ini bersifat rahasia (Confidential) — Aksi Ekologi dan Emansipasi Rakyat (AEER)</span>
-            <span>Generated via AEER Payroll System</span>
+          <div class="mt-5 pt-2 border-t border-slate-200 flex items-center justify-between text-[9px] text-slate-400">
+            <span>Dokumen Rahasia (Confidential) — Aksi Ekologi dan Emansipasi Rakyat (AEER)</span>
+            <span>AEER Payroll System</span>
           </div>
         </div>
       </article>
@@ -564,7 +578,7 @@
   </main>
 
   <script>
-    // Simpan SVG fallback jika ./logo-aeer.jpg belum ditemukan di local preview
+    // SVG Fallback jika ./logo-aeer.jpg tidak ditemukan saat pratinjau lokal
     const defaultLogoHTML = `
       <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -595,22 +609,10 @@
     `;
     const initialLogoContainerHTML = document.getElementById('logoContainer').innerHTML;
 
-    // Format angka ke Rupiah Indonesia
+    // Format angka ke Rupiah dengan titik pemisah ribuan
     function formatIDR(num) {
       const rounded = Math.round(num || 0);
       return 'Rp ' + rounded.toLocaleString('id-ID');
-    }
-
-    // Format tanggal YYYY-MM-DD ke format Indonesia
-    function formatDateIndo(dateStr) {
-      if (!dateStr) return '-';
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-      const parts = dateStr.split('-');
-      if (parts.length !== 3) return dateStr;
-      const day = parts[2];
-      const month = months[parseInt(parts[1], 10) - 1] || parts[1];
-      const year = parts[0];
-      return `${day} ${month} ${year}`;
     }
 
     // Fungsi Terbilang Bahasa Indonesia
@@ -629,19 +631,10 @@
       return '';
     }
 
-    // Estimasi PPh 21 TER Bulanan (PP 58/2023)
-    function estimatePPh21TER(gross, ptkp, isProrata, activeDays, totalDays) {
+    // Estimasi PPh 21 Bulanan (PMK 168/2023 TER Kategori A & B)
+    function estimatePPh21TER(gross, ptkp) {
       if (gross <= 0) return 0;
 
-      // Kecocokan khusus dengan offering letter Yohan Kurniawan
-      if (!isProrata && Math.round(gross) === 32000000 && ptkp === 'K/3') {
-        return 3840000;
-      }
-      if (isProrata && activeDays === 14 && totalDays === 23 && Math.round(gross) === 19386955 && ptkp === 'K/3') {
-        return 1259652;
-      }
-
-      // Kategori TER berdasarkan PTKP
       const catA = ['TK/0', 'TK/1', 'K/0'];
       const catB = ['TK/2', 'TK/3', 'K/1', 'K/2', 'K/3'];
       let rate = 0;
@@ -690,147 +683,177 @@
         else if (gross <= 27000000) rate = 0.10;
         else if (gross <= 29500000) rate = 0.11;
         else if (gross <= 32000000) rate = 0.12;
-        else rate = 0.13;
+        else if (gross <= 35000000) rate = 0.13;
+        else rate = 0.14;
       }
       return Math.round(gross * rate);
     }
 
-    // Trigger ketika komponen gaji/prorata/PTKP berubah
-    function onPtkpOrIncomeChange() {
-      const isProrata = document.getElementById('prorataActive').checked;
-      const activeDays = Math.max(1, parseFloat(document.getElementById('activeDays').value) || 1);
+    // Hitung komponen pendapatan & trigger auto-pajak jika aktif
+    function calculateComponents() {
       const totalDays = Math.max(1, parseFloat(document.getElementById('totalDays').value) || 1);
-      const factor = isProrata ? (activeDays / totalDays) : 1;
+      const presentDays = Math.max(0, parseFloat(document.getElementById('presentDays').value) || 0);
+      const leaveDays = Math.max(0, parseFloat(document.getElementById('leaveDays').value) || 0);
+      const absentDays = Math.max(0, parseFloat(document.getElementById('absentDays').value) || 0);
+      const plDays = Math.max(0, parseFloat(document.getElementById('plDays').value) || 0);
 
+      // Hari bayar komponen tetap (Gaji Dasar, Tj. Posisi, Tj. Rumah):
+      // Hadir + Cuti/Sakit dikurangi Mangkir (dibatasi 0..totalDays)
+      const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
+      const fixedRatio = fixedPaidDays / totalDays;
+
+      // Hari bayar tunjangan harian (Tj. Transport & Tj. Kehadiran):
+      // Hadir dikurangi Mangkir (Cuti/Sakit juga memotong tunjangan transport & kehadiran)
+      const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
+      const dailyRatio = dailyPaidDays / totalDays;
+
+      // Rate penuh bulanan
       const fullBase = parseFloat(document.getElementById('baseSalary').value) || 0;
       const fullPos = parseFloat(document.getElementById('posAllowance').value) || 0;
+      const fullHousing = parseFloat(document.getElementById('housingAllowance').value) || 0;
       const fullTrans = parseFloat(document.getElementById('transAllowance').value) || 0;
       const fullAtt = parseFloat(document.getElementById('attAllowance').value) || 0;
-      const fullHousing = parseFloat(document.getElementById('housingAllowance').value) || 0;
-      const fullBpjsComp = parseFloat(document.getElementById('bpjsCompany').value) || 0;
-      const fullJpComp = parseFloat(document.getElementById('jpCompany').value) || 0;
+      const fullBpjsBen = parseFloat(document.getElementById('bpjsBenefit').value) || 0;
+      const isProrataBpjs = document.getElementById('prorataBpjsBenefit').checked;
 
-      const gross = Math.round(fullBase * factor)
-                  + Math.round(fullPos * factor)
-                  + Math.round(fullTrans * factor)
-                  + Math.round(fullAtt * factor)
-                  + Math.round(fullHousing * factor)
-                  + Math.round(fullBpjsComp * factor)
-                  + Math.round(fullJpComp * factor);
+      // Nilai terhitung
+      const valBase = Math.round(fullBase * fixedRatio);
+      const valPos = Math.round(fullPos * fixedRatio);
+      const valHousing = Math.round(fullHousing * fixedRatio);
+      const valTrans = Math.round(fullTrans * dailyRatio);
+      const valAtt = Math.round(fullAtt * dailyRatio);
+      const valBpjsBen = isProrataBpjs ? Math.round(fullBpjsBen * fixedRatio) : Math.round(fullBpjsBen);
 
+      const grossEarnings = valBase + valPos + valHousing + valTrans + valAtt + valBpjsBen;
+
+      return {
+        totalDays,
+        presentDays,
+        leaveDays,
+        absentDays,
+        plDays,
+        fixedPaidDays,
+        fixedRatio,
+        dailyPaidDays,
+        dailyRatio,
+        fullBase,
+        fullPos,
+        fullHousing,
+        fullTrans,
+        fullAtt,
+        fullBpjsBen,
+        isProrataBpjs,
+        valBase,
+        valPos,
+        valHousing,
+        valTrans,
+        valAtt,
+        valBpjsBen,
+        grossEarnings
+      };
+    }
+
+    function onFormulaInputChange() {
+      const calc = calculateComponents();
       if (document.getElementById('autoTax').checked) {
         const ptkp = document.getElementById('empPtkp').value;
-        const estimatedTax = estimatePPh21TER(gross, ptkp, isProrata, activeDays, totalDays);
-        document.getElementById('regularTax').value = estimatedTax;
+        document.getElementById('regularTax').value = estimatePPh21TER(calc.grossEarnings, ptkp);
       }
-
       updatePayslip();
     }
 
-    // Render ulang seluruh tampilan A4 Payslip
     function updatePayslip() {
+      const calc = calculateComponents();
+
       // Identitas
       const empName = document.getElementById('empName').value || '-';
       const empTitle = document.getElementById('empTitle').value || '-';
       const empId = document.getElementById('empId').value || '-';
-      const empNpwp = document.getElementById('empNpwp').value || '-';
       const empPtkp = document.getElementById('empPtkp').value || 'K/3';
-      const empJoinDate = document.getElementById('empJoinDate').value;
-      const empBank = document.getElementById('empBank').value || '-';
-
-      // Periode & Prorata
+      const empJoinDate = document.getElementById('empJoinDate').value || '-';
       const payPeriod = document.getElementById('payPeriod').value || '-';
-      const payDate = document.getElementById('payDate').value || '-';
-      const isProrata = document.getElementById('prorataActive').checked;
-      const activeDays = Math.max(1, parseFloat(document.getElementById('activeDays').value) || 1);
-      const totalDays = Math.max(1, parseFloat(document.getElementById('totalDays').value) || 1);
-      const factor = isProrata ? (activeDays / totalDays) : 1;
-      const pct = (factor * 100).toFixed(2);
-
-      document.getElementById('prorataBox').style.opacity = isProrata ? '1' : '0.45';
-      document.getElementById('prorataRatioDisplay').textContent = isProrata ? `${pct}%` : '100% (Full)';
-
-      // Nilai Earnings Full
-      const fullBase = parseFloat(document.getElementById('baseSalary').value) || 0;
-      const fullPos = parseFloat(document.getElementById('posAllowance').value) || 0;
-      const fullTrans = parseFloat(document.getElementById('transAllowance').value) || 0;
-      const fullAtt = parseFloat(document.getElementById('attAllowance').value) || 0;
-      const fullHousing = parseFloat(document.getElementById('housingAllowance').value) || 0;
-      const fullBpjsComp = parseFloat(document.getElementById('bpjsCompany').value) || 0;
-      const fullJpComp = parseFloat(document.getElementById('jpCompany').value) || 0;
-
-      // Nilai Earnings Terhitung
-      const valBase = Math.round(fullBase * factor);
-      const valPos = Math.round(fullPos * factor);
-      const valTrans = Math.round(fullTrans * factor);
-      const valAtt = Math.round(fullAtt * factor);
-      const valHousing = Math.round(fullHousing * factor);
-      const valBpjsComp = Math.round(fullBpjsComp * factor);
-      const valJpComp = Math.round(fullJpComp * factor);
-
-      const grossEarnings = valBase + valPos + valTrans + valAtt + valHousing + valBpjsComp + valJpComp;
+      const empBank = document.getElementById('empBank').value || '-';
+      const approverName = document.getElementById('approverName').value || '-';
 
       // Deductions
-      const fullBpjsEmp = parseFloat(document.getElementById('bpjsEmployee').value) || 0;
-      const isProrataBpjs = document.getElementById('prorataBpjs').checked && isProrata;
-      const valBpjsEmp = isProrataBpjs ? Math.round(fullBpjsEmp * factor) : Math.round(fullBpjsEmp);
-
       const valTax = Math.round(parseFloat(document.getElementById('regularTax').value) || 0);
-      const grossDeductions = valBpjsEmp + valTax;
-      const netPay = Math.max(0, grossEarnings - grossDeductions);
+      const valOtherDed = Math.round(parseFloat(document.getElementById('otherDeduction').value) || 0);
+      const grossDeductions = valTax + valOtherDed;
+      const netPay = Math.max(0, calc.grossEarnings - grossDeductions);
 
-      // Update Header & Info Karyawan di A4
+      // Update ringkasan formula di panel kiri
+      const fixedPct = (calc.fixedRatio * 100).toFixed(2);
+      const dailyPct = (calc.dailyRatio * 100).toFixed(2);
+      document.getElementById('attendanceFormulaSummary').innerHTML = `
+        <div>• <strong>Komponen Tetap</strong> (Gaji Dasar, Tj. Posisi, Tj. Rumah): dibayar <strong class="text-slate-900">${calc.fixedPaidDays} / ${calc.totalDays} hari</strong> (${fixedPct}%) — <em>Cuti/Sakit dibayar, Mangkir dipotong</em>.</div>
+        <div>• <strong>Tunjangan Harian</strong> (Tj. Transport &amp; Tj. Kehadiran): dibayar <strong class="text-slate-900">${calc.dailyPaidDays} / ${calc.totalDays} hari</strong> (${dailyPct}%) — <em>Cuti/Sakit &amp; Mangkir dipotong</em>.</div>
+      `;
+
+      // Update header & identitas dokumen A4
       document.getElementById('docPeriodBadge').textContent = `Periode: ${payPeriod}`;
       document.getElementById('viewEmpName').textContent = empName;
       document.getElementById('viewEmpTitle').textContent = empTitle;
       document.getElementById('viewEmpId').textContent = empId;
       document.getElementById('viewEmpPtkp').textContent = empPtkp;
-      document.getElementById('viewEmpNpwp').textContent = empNpwp;
       document.getElementById('viewPayPeriod').textContent = payPeriod;
-      document.getElementById('viewPayDate').textContent = payDate;
+      document.getElementById('viewJoinDate').textContent = empJoinDate;
       document.getElementById('viewEmpBank').textContent = empBank;
+      document.getElementById('viewRatioInfo').textContent = `${calc.fixedPaidDays} / ${calc.totalDays} Hari Kerja (${fixedPct}%)`;
 
-      const joinFormatted = formatDateIndo(empJoinDate);
-      document.getElementById('viewWorkInfo').textContent = isProrata
-        ? `${joinFormatted} (Prorata ${activeDays}/${totalDays} hari)`
-        : `${joinFormatted} (Full Bulan)`;
+      // Update Strip Kehadiran
+      document.getElementById('stripTotalDays').textContent = `${calc.totalDays} Hari`;
+      document.getElementById('stripPresentDays').textContent = `${calc.presentDays} Hari`;
+      document.getElementById('stripLeaveDays').textContent = `${calc.leaveDays} Hari`;
+      document.getElementById('stripAbsentDays').textContent = `${calc.absentDays} Hari`;
+      document.getElementById('stripPlDays').textContent = `${calc.plDays} Hari`;
 
-      // Update Tabel Angka
-      document.getElementById('valBase').textContent = formatIDR(valBase);
-      document.getElementById('valPos').textContent = formatIDR(valPos);
-      document.getElementById('valTrans').textContent = formatIDR(valTrans);
-      document.getElementById('valAtt').textContent = formatIDR(valAtt);
-      document.getElementById('valHousing').textContent = formatIDR(valHousing);
-      document.getElementById('valBpjsComp').textContent = formatIDR(valBpjsComp);
-      document.getElementById('valJpComp').textContent = formatIDR(valJpComp);
+      // Update Tabel Earnings & Benefits
+      document.getElementById('valBase').textContent = formatIDR(calc.valBase);
+      document.getElementById('subBase').textContent = `Full: ${formatIDR(calc.fullBase)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
 
-      // Sub-keterangan Prorata
-      document.getElementById('subBase').textContent = isProrata ? `Full: ${formatIDR(fullBase)} (${activeDays}/${totalDays} hr)` : 'Full Monthly Base Salary';
-      document.getElementById('subPos').textContent = isProrata ? `Full: ${formatIDR(fullPos)}` : 'Full Monthly Allowance';
-      document.getElementById('subTrans').textContent = isProrata ? `Full: ${formatIDR(fullTrans)}` : 'Full Monthly Allowance';
-      document.getElementById('subAtt').textContent = isProrata ? `Full: ${formatIDR(fullAtt)}` : 'Full Monthly Allowance';
+      document.getElementById('valPos').textContent = formatIDR(calc.valPos);
+      document.getElementById('subPos').textContent = `Full: ${formatIDR(calc.fullPos)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
 
-      document.getElementById('valBpjsEmp').textContent = formatIDR(valBpjsEmp);
-      document.getElementById('subBpjsEmp').textContent = isProrataBpjs ? `Full: ${formatIDR(fullBpjsEmp)} (Prorata)` : 'Iuran Peserta (Full)';
+      document.getElementById('valHousing').textContent = formatIDR(calc.valHousing);
+      document.getElementById('subHousing').textContent = `Full: ${formatIDR(calc.fullHousing)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
+
+      document.getElementById('valTrans').textContent = formatIDR(calc.valTrans);
+      document.getElementById('subTrans').textContent = `Full: ${formatIDR(calc.fullTrans)} (${calc.dailyPaidDays}/${calc.totalDays} hr hadir)`;
+
+      document.getElementById('valAtt').textContent = formatIDR(calc.valAtt);
+      document.getElementById('subAtt').textContent = `Full: ${formatIDR(calc.fullAtt)} (${calc.dailyPaidDays}/${calc.totalDays} hr hadir)`;
+
+      document.getElementById('valBpjsBen').textContent = formatIDR(calc.valBpjsBen);
+      document.getElementById('subBpjsBen').textContent = calc.isProrataBpjs
+        ? `Benefit Mandiri Prorata (${calc.fixedPaidDays}/${calc.totalDays} hr)`
+        : `Benefit Kepesertaan Mandiri (Full ${formatIDR(calc.fullBpjsBen)})`;
+
+      // Update Deductions
       document.getElementById('valTax').textContent = formatIDR(valTax);
-      document.getElementById('subTax').textContent = `Status ${empPtkp} (PPh 21 Bulanan)`;
+      const terCategory = ['TK/0', 'TK/1', 'K/0'].includes(empPtkp) ? 'TER Kategori A' : 'TER Kategori B';
+      document.getElementById('subTax').textContent = `Status ${empPtkp} (${terCategory})`;
+      document.getElementById('valOtherDed').textContent = formatIDR(valOtherDed);
 
-      document.getElementById('valGrossEarnings').textContent = formatIDR(grossEarnings);
+      // Update Totals & THP
+      document.getElementById('valGrossEarnings').textContent = formatIDR(calc.grossEarnings);
       document.getElementById('valGrossDeductions').textContent = formatIDR(grossDeductions);
       document.getElementById('valNetPay').textContent = formatIDR(netPay);
 
-      // Terbilang
       const words = terbilang(netPay).replace(/\s+/g, ' ').trim();
       document.getElementById('valTerbilang').textContent = `Terbilang: ${words ? words + ' Rupiah' : 'Nol Rupiah'}`;
 
-      // Catatan Kaki
-      document.getElementById('docFootnote').innerHTML = isProrata
-        ? `<strong>Catatan Perhitungan:</strong> Gaji dan tunjangan dihitung secara prorata berdasarkan hari kerja efektif sejak tanggal bergabung (${joinFormatted}) hingga tanggal cut-off, yaitu <strong>${activeDays} hari kerja dari total ${totalDays} hari kerja</strong> (${pct}%). Pemotongan PPh Pasal 21 mengacu pada ketentuan Tarif Efektif Bulanan (TER) sesuai status PTKP karyawan (${empPtkp}).`
-        : `<strong>Catatan Perhitungan:</strong> Gaji dan tunjangan dibayarkan penuh (100%) untuk periode cut-off ${payPeriod}. Pemotongan PPh Pasal 21 mengacu pada ketentuan Tarif Efektif Bulanan (TER) sesuai status PTKP karyawan (${empPtkp}).`;
+      // Update Kotak Hak PL / LP
+      document.getElementById('plEntitlementText').innerHTML = `
+        Karyawan berhak atas <strong>${calc.plDays} hari Pengganti Libur (PL/LP)</strong> pada bulan berjalan atas kehadiran di hari akhir pekan (weekend).
+      `;
 
-      // Pengesahan
-      document.getElementById('viewApproverName').textContent = document.getElementById('approverName').value || '-';
-      document.getElementById('viewApproverTitle').textContent = document.getElementById('approverTitle').value || '-';
+      // Update Catatan Kaki
+      document.getElementById('docFootnote').innerHTML = `
+        <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (${calc.fixedPaidDays}/${calc.totalDays} hari) serta dipotong proporsional atas mangkir (${calc.absentDays} hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir (${calc.dailyPaidDays}/${calc.totalDays} hari; cuti/sakit &amp; mangkir memotong tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan sebagai benefit mandiri.
+      `;
+
+      // Update Blok Tanda Tangan
+      document.getElementById('viewApproverName').textContent = approverName;
       document.getElementById('viewReceiverName').textContent = empName;
       document.getElementById('viewReceiverTitle').textContent = empTitle;
     }
@@ -859,35 +882,31 @@
     function resetDefaults() {
       document.getElementById('empName').value = 'Yohan Kurniawan';
       document.getElementById('empTitle').value = 'Senior Operation and People Manager';
-      document.getElementById('empId').value = 'AEER-2026-1106';
-      document.getElementById('empNpwp').value = '-';
+      document.getElementById('empId').value = 'AEER-2026-011';
       document.getElementById('empPtkp').value = 'K/3';
-      document.getElementById('empJoinDate').value = '2026-11-06';
-      document.getElementById('empBank').value = 'BCA — a.n. Yohan Kurniawan';
+      document.getElementById('empJoinDate').value = '6 November 2026';
+      document.getElementById('payPeriod').value = '26 Oktober – 25 November 2026';
+      document.getElementById('empBank').value = 'BCA - a.n. Yohan Kurniawan';
+      document.getElementById('approverName').value = 'Pius Ginting';
 
-      document.getElementById('payPeriod').value = '26 Oktober 2026 – 25 November 2026';
-      document.getElementById('payDate').value = '25 November 2026';
-      document.getElementById('prorataActive').checked = true;
-      document.getElementById('activeDays').value = '14';
       document.getElementById('totalDays').value = '23';
+      document.getElementById('presentDays').value = '14';
+      document.getElementById('leaveDays').value = '0';
+      document.getElementById('absentDays').value = '0';
+      document.getElementById('plDays').value = '0';
 
       document.getElementById('baseSalary').value = '23850000';
       document.getElementById('posAllowance').value = '5000000';
+      document.getElementById('housingAllowance').value = '0';
       document.getElementById('transAllowance').value = '1500000';
       document.getElementById('attAllowance').value = '1500000';
-      document.getElementById('housingAllowance').value = '0';
-      document.getElementById('bpjsCompany').value = '0';
-      document.getElementById('jpCompany').value = '0';
+      document.getElementById('bpjsBenefit').value = '150000';
+      document.getElementById('prorataBpjsBenefit').checked = false;
 
-      document.getElementById('bpjsEmployee').value = '150000';
-      document.getElementById('prorataBpjs').checked = true;
       document.getElementById('autoTax').checked = true;
-      document.getElementById('regularTax').value = '1259652';
+      document.getElementById('otherDeduction').value = '0';
 
-      document.getElementById('approverName').value = 'Pius Ginting';
-      document.getElementById('approverTitle').value = 'Koordinator AEER';
-
-      onPtkpOrIncomeChange();
+      onFormulaInputChange();
       showToast('Data berhasil dikembalikan ke pengaturan default.');
     }
 
@@ -919,7 +938,7 @@
 
     // Inisialisasi awal
     window.addEventListener('DOMContentLoaded', () => {
-      onPtkpOrIncomeChange();
+      onFormulaInputChange();
     });
   </script>
 </body>
