@@ -93,11 +93,14 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-bold tracking-tight">AEER Payslip Generator</h1>
-          <p class="text-xs text-slate-300">Payroll Prorata, Benefit BPJS Mandiri, Hak PL &amp; Rekonsiliasi PPh 21 (PMK 168/2023)</p>
+          <p class="text-xs text-slate-300">Payroll PKWT/PKWTT &amp; Consultant (2,5%), Benefit BPJS Mandiri &amp; PPh 21 (PMK 168/2023)</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="applyConsultantPreset()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-indigo-600/90 hover:bg-indigo-500 text-white transition cursor-pointer" title="Simulasi Cepat Slip Gaji / Fee Consultant (PPh 21 2,5%)">
+          Simulasi Consultant
+        </button>
         <button type="button" onclick="applyDecemberPreset()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-amber-600/90 hover:bg-amber-500 text-white transition cursor-pointer" title="Simulasi Gaji Desember 2026 + Pengembalian Lebih Potong PPh 21 November">
           Simulasi Des (Refund Pajak)
         </button>
@@ -200,18 +203,25 @@
 
       <!-- 1. Identitas Karyawan & Periode -->
       <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan &amp; Periode</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan / Konsultan &amp; Periode</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-[#0f2942] mb-1">Status Karyawan / Kontrak (Status_Karyawan)</label>
+            <select id="empStatus" onchange="onEmploymentStatusChange()" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-[#0284c7]/50 bg-sky-50/60 font-semibold text-[#0f2942] focus:ring-2 focus:ring-[#0284c7] outline-none">
+              <option value="PKWT/PKWTT" selected>PKWT/PKWTT (Karyawan Kontrak / Tetap)</option>
+              <option value="Consultant">Consultant (Tenaga Ahli / Konsultan — PPh 21 2,5%)</option>
+            </select>
+          </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Nama Karyawan</label>
+            <label class="block text-xs font-medium text-slate-700 mb-1" id="lblEmpNameInput">Nama Karyawan</label>
             <input type="text" id="empName" value="Yohan Kurniawan" oninput="onDirectNameInput(this.value)" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan</label>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan / Posisi</label>
             <input type="text" id="empTitle" value="Senior Operation and People Manager" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">NIK / ID Karyawan</label>
+            <label class="block text-xs font-medium text-slate-700 mb-1">NIK / ID Kontrak</label>
             <input type="text" id="empId" value="AEER-2026-1106" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
@@ -227,7 +237,7 @@
             <input type="text" id="empBankAccount" value="" placeholder="Contoh: 1234567890" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none font-mono" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Join Date</label>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Join Date / Mulai Kontrak</label>
             <input type="text" id="empJoinDate" value="6 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
@@ -238,7 +248,7 @@
             <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Pembayaran (Payment Date)</label>
             <input type="text" id="payDate" value="25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
-          <div>
+          <div id="ptkpFieldGroup">
             <label class="block text-xs font-medium text-slate-700 mb-1">Status Pajak (PTKP)</label>
             <select id="empPtkp" onchange="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none">
               <option value="TK/0">TK/0 (TER Kategori A)</option>
@@ -255,7 +265,7 @@
               <option value="K/I/3">K/I/3 (TER Kategori C)</option>
             </select>
           </div>
-          <div>
+          <div id="monthsWorkedFieldGroup">
             <label class="block text-xs font-medium text-slate-700 mb-1">Masa Kerja Tahun Berjalan (Bulan)</label>
             <input type="number" id="monthsWorkedYear" value="2" min="1" max="12" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none font-semibold" />
           </div>
@@ -266,27 +276,27 @@
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">2. Kehadiran &amp; Hari Kerja</h3>
-          <span class="text-[11px] font-medium text-slate-500">Dasar Hitung Prorata</span>
+          <span class="text-[11px] font-medium text-slate-500" id="attendanceBadgeSubtitle">Dasar Hitung Prorata</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-sky-50/70 p-3.5 rounded-xl border border-sky-200">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Total Hari Kerja</label>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Total Hari Kerja (Working Days)</label>
             <input type="number" id="totalDays" value="23" min="1" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Hadir</label>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1" id="lblPresentDaysInput">Jumlah Hadir</label>
             <input type="number" id="presentDays" value="14" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-emerald-700" />
           </div>
-          <div>
+          <div id="leaveFieldGroup">
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Cuti / Sakit</label>
             <input type="number" id="leaveDays" value="0" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-700" />
           </div>
-          <div>
+          <div id="absentFieldGroup">
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Mangkir</label>
             <input type="number" id="absentDays" value="0" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-rose-700" />
           </div>
-          <div class="col-span-2">
+          <div class="col-span-2" id="plFieldGroup">
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah PL (Pengganti Libur - Weekend)</label>
             <input type="number" id="plDays" value="0" min="0" max="15" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-[#0284c7]" />
           </div>
@@ -297,29 +307,29 @@
 
       <!-- 3. Gaji Dasar, Tunjangan & Benefit -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">3. Gaji &amp; Benefit Bulanan (Full Rate - Rp)</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]" id="salarySectionHeading">3. Gaji &amp; Benefit Bulanan (Full Rate - Rp)</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Gaji Dasar (Base Salary)</label>
+            <label class="block text-xs font-medium text-slate-700 mb-1" id="lblBaseSalaryInput">Gaji Dasar (Base Salary)</label>
             <input type="number" id="baseSalary" value="23850000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
+          <div class="pkwt-only-field">
             <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Posisi (Positional)</label>
             <input type="number" id="posAllowance" value="5000000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
+          <div class="pkwt-only-field">
             <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Rumah (Housing)</label>
             <input type="number" id="housingAllowance" value="0" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
+          <div class="pkwt-only-field">
             <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Transport</label>
             <input type="number" id="transAllowance" value="1500000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
+          <div class="pkwt-only-field">
             <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Kehadiran</label>
             <input type="number" id="attAllowance" value="1500000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
-          <div>
+          <div class="pkwt-only-field">
             <label class="block text-xs font-medium text-emerald-800 mb-1">Tunjangan BPJS Kesehatan (Benefit Full)</label>
             <input type="number" id="bpjsBenefit" value="150000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-emerald-300 bg-emerald-50/40 font-semibold text-emerald-950" />
           </div>
@@ -330,35 +340,55 @@
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">4. Perhitungan Pajak PPh 21 (PMK 168/2023)</h3>
 
-        <div>
-          <label class="block text-xs font-medium text-slate-700 mb-1">Metode Perhitungan PPh 21</label>
-          <select id="taxMode" onchange="onTaxModeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-medium text-slate-800 focus:ring-2 focus:ring-[#0284c7] outline-none">
-            <option value="TER" selected>1. TER Bulanan (PMK 168/2023) — Masa Pajak Berjalan (Nov 2026)</option>
-            <option value="RECON">2. Rekonsiliasi Akhir Tahun / Masa Pajak Terakhir (2 Bulan Kerja — Des 2026)</option>
-            <option value="MANUAL">3. Manual / Custom Tax Amount</option>
-          </select>
-        </div>
-
-        <!-- Panel Rekonsiliasi Akhir Tahun (2 Bulan Kerja) -->
-        <div id="reconFieldsPanel" class="hidden space-y-2.5 bg-amber-50/80 border border-amber-200 p-3.5 rounded-xl">
-          <div class="text-xs font-semibold text-amber-950">Parameter Rekonsiliasi Masa Pajak Terakhir (Pasal 15 &amp; 21 PMK 168/2023)</div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[11px] font-medium text-slate-700 mb-1">Akumulasi Bruto Bulan Sebelumnya (Nov 2026)</label>
-              <input type="number" id="priorGrossAccum" value="19536957" step="1000" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white" />
-            </div>
-            <div>
-              <label class="block text-[11px] font-medium text-slate-700 mb-1">PPh 21 Sudah Dipotong Sebelumnya (Nov 2026)</label>
-              <input type="number" id="priorTaxWithheld" value="1363478" step="1" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-900" />
-            </div>
+        <div id="pkwtTaxControls" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Metode Perhitungan PPh 21</label>
+            <select id="taxMode" onchange="onTaxModeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-medium text-slate-800 focus:ring-2 focus:ring-[#0284c7] outline-none">
+              <option value="TER" selected>1. TER Bulanan (PMK 168/2023) — Masa Pajak Berjalan (Nov 2026)</option>
+              <option value="RECON">2. Rekonsiliasi Akhir Tahun / Masa Pajak Terakhir (2 Bulan Kerja — Des 2026)</option>
+              <option value="MANUAL">3. Manual / Custom Tax Amount</option>
+            </select>
           </div>
-          <p class="text-[11px] text-amber-900 leading-relaxed" id="reconPreviewSummary"></p>
+
+          <!-- Panel Rekonsiliasi Akhir Tahun (2 Bulan Kerja) -->
+          <div id="reconFieldsPanel" class="hidden space-y-2.5 bg-amber-50/80 border border-amber-200 p-3.5 rounded-xl">
+            <div class="text-xs font-semibold text-amber-950">Parameter Rekonsiliasi Masa Pajak Terakhir (Pasal 15 &amp; 21 PMK 168/2023)</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-medium text-slate-700 mb-1">Akumulasi Bruto Bulan Sebelumnya (Nov 2026)</label>
+                <input type="number" id="priorGrossAccum" value="19536957" step="1000" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-slate-700 mb-1">PPh 21 Sudah Dipotong Sebelumnya (Nov 2026)</label>
+                <input type="number" id="priorTaxWithheld" value="1363478" step="1" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-900" />
+              </div>
+            </div>
+            <p class="text-[11px] text-amber-900 leading-relaxed" id="reconPreviewSummary"></p>
+          </div>
+
+          <!-- Panel Manual Tax -->
+          <div id="manualTaxPanel" class="hidden bg-slate-50 border border-slate-200 p-3 rounded-xl">
+            <label class="block text-xs font-medium text-slate-700 mb-1">Nominal PPh 21 Manual (Rp) <span class="text-[11px] text-slate-500">(gunakan tanda minus "-" jika pengembalian lebih potong)</span></label>
+            <input type="number" id="manualTaxAmount" value="0" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
+          </div>
         </div>
 
-        <!-- Panel Manual Tax -->
-        <div id="manualTaxPanel" class="hidden bg-slate-50 border border-slate-200 p-3 rounded-xl">
-          <label class="block text-xs font-medium text-slate-700 mb-1">Nominal PPh 21 Manual (Rp) <span class="text-[11px] text-slate-500">(gunakan tanda minus "-" jika pengembalian lebih potong)</span></label>
-          <input type="number" id="manualTaxAmount" value="0" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
+        <!-- Panel Pajak Consultant (2,5% Efektif PMK 168/2023) -->
+        <div id="consultantTaxControls" class="hidden space-y-2.5 bg-indigo-50/80 border border-indigo-200 p-3.5 rounded-xl">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-950">PPh 21 Consultant / Bukan Pegawai (Tarif Efektif 2,5%)</span>
+            <label class="inline-flex items-center gap-1.5 text-[11px] font-medium text-indigo-900 cursor-pointer">
+              <input type="checkbox" id="consultantManualTaxToggle" onchange="onConsultantTaxToggle()" class="rounded border-indigo-300 text-indigo-600" />
+              Override Manual
+            </label>
+          </div>
+          <p class="text-[11px] text-indigo-900 leading-relaxed">
+            Rumus otomatis: <strong>(Total Hari Bekerja ÷ Working Days × Fee Bulanan) × 2,5%</strong> (DPP 50% × 5% Pasal 17 sesuai PMK 168/2023).
+          </p>
+          <div id="consultantManualTaxWrap" class="hidden">
+            <label class="block text-[11px] font-medium text-slate-700 mb-1">Nominal PPh 21 Konsultan Manual (Rp)</label>
+            <input type="number" id="consultantManualTaxAmount" value="0" step="1" oninput="updatePayslip()" class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -416,7 +446,7 @@
 
           <!-- BANNER JUDUL -->
           <div class="mt-3 mb-3 flex items-center justify-between bg-[#0f2942] text-white px-4 py-2 rounded-md">
-            <h2 class="text-xs font-bold uppercase tracking-[0.12em]">SLIP GAJI KARYAWAN / EMPLOYEE PAYSLIP</h2>
+            <h2 class="text-xs font-bold uppercase tracking-[0.12em]" id="docMainBannerTitle">SLIP GAJI KARYAWAN / EMPLOYEE PAYSLIP</h2>
             <span class="text-[10.5px] font-medium text-sky-200" id="docPeriodBadge">Periode: 26 Oktober – 25 November 2026</span>
           </div>
 
@@ -424,14 +454,19 @@
           <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[10.5px] bg-slate-50 border border-slate-200 rounded-lg p-3 mb-2.5">
             <div class="space-y-1">
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Nama Karyawan</span>
+                <span class="w-28 text-slate-500 shrink-0" id="viewEmpNameLabel">Nama Karyawan</span>
                 <span class="mr-2 text-slate-500">:</span>
                 <span class="font-bold text-slate-900" id="viewEmpName">Yohan Kurniawan</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Jabatan</span>
+                <span class="w-28 text-slate-500 shrink-0">Jabatan / Posisi</span>
                 <span class="mr-2 text-slate-500">:</span>
                 <span class="font-semibold text-slate-800" id="viewEmpTitle">Senior Operation and People Manager</span>
+              </div>
+              <div class="flex">
+                <span class="w-28 text-slate-500 shrink-0">Status Kontrak</span>
+                <span class="mr-2 text-slate-500">:</span>
+                <span class="font-bold text-[#0284c7]" id="viewEmpStatus">PKWT/PKWTT</span>
               </div>
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">NIK / ID</span>
@@ -466,40 +501,44 @@
                 <span class="mr-2 text-slate-500">:</span>
                 <span class="text-slate-800" id="viewJoinDate">6 November 2026</span>
               </div>
-              <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Status PTKP</span>
+              <div class="flex" id="viewPtkpRow">
+                <span class="w-28 text-slate-500 shrink-0">Status Pajak</span>
                 <span class="mr-2 text-slate-500">:</span>
                 <span class="font-semibold text-slate-800" id="viewEmpPtkp">K/3 (TER Kategori B)</span>
               </div>
-              <div class="flex">
+              <div class="flex" id="viewMonthsWorkedRow">
                 <span class="w-28 text-slate-500 shrink-0">Masa Kerja 2026</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewMonthsWorked">2 Bulan (Nov – Des 2026)</span>
+                <span class="text-slate-800" id="viewMonthsWorked">2 Bulan (Tahun Berjalan)</span>
               </div>
             </div>
           </div>
 
           <!-- 3. STRIP KEHADIRAN -->
-          <div class="grid grid-cols-5 border border-slate-300 rounded-lg overflow-hidden mb-3 text-center text-[10px]">
+          <div id="attendanceStripContainer" class="grid grid-cols-5 border border-slate-300 rounded-lg overflow-hidden mb-3 text-center text-[10px]">
             <div class="py-1.5 px-2 bg-slate-100 border-r border-slate-300">
               <div class="text-slate-500 font-medium">Hari Kerja</div>
               <div class="font-bold text-slate-900 text-xs mt-0.5" id="stripTotalDays">23 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-emerald-50/70 border-r border-slate-300">
-              <div class="text-emerald-700 font-medium">Hadir</div>
+            <div class="py-1.5 px-2 bg-emerald-50/70 border-r border-slate-300" id="stripPresentBox">
+              <div class="text-emerald-700 font-medium" id="stripPresentLabel">Hadir</div>
               <div class="font-bold text-emerald-900 text-xs mt-0.5" id="stripPresentDays">14 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-amber-50/70 border-r border-slate-300">
+            <div class="py-1.5 px-2 bg-amber-50/70 border-r border-slate-300 pkwt-strip-col">
               <div class="text-amber-700 font-medium">Cuti / Sakit</div>
               <div class="font-bold text-amber-900 text-xs mt-0.5" id="stripLeaveDays">0 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-rose-50/70 border-r border-slate-300">
+            <div class="py-1.5 px-2 bg-rose-50/70 border-r border-slate-300 pkwt-strip-col">
               <div class="text-rose-700 font-medium">Mangkir</div>
               <div class="font-bold text-rose-900 text-xs mt-0.5" id="stripAbsentDays">0 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-sky-50/80">
+            <div class="py-1.5 px-2 bg-sky-50/80 pkwt-strip-col">
               <div class="text-[#0284c7] font-medium">Hak PL (Weekend)</div>
               <div class="font-bold text-[#0f2942] text-xs mt-0.5" id="stripPlDays">0 Hari</div>
+            </div>
+            <div id="stripConsultantNoteBox" class="hidden py-1.5 px-3 bg-indigo-50/70 text-left flex flex-col justify-center">
+              <div class="text-indigo-800 font-semibold text-[9.5px]">Skema Kehadiran Consultant</div>
+              <div class="text-slate-600 text-[9px] mt-0.5" id="stripConsultantRatioText">Rasio Hari Bekerja: 18 / 23 hari (termasuk hari kerja akhir pekan bila bertugas)</div>
             </div>
           </div>
 
@@ -508,7 +547,7 @@
             <table class="w-full text-[10.5px] border-collapse">
               <thead>
                 <tr class="bg-[#0f2942] text-white">
-                  <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600">EARNINGS &amp; BENEFITS</th>
+                  <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600" id="tblEarningsHeader">EARNINGS &amp; BENEFITS</th>
                   <th class="text-right py-2 px-3 font-semibold w-[16%] border-r border-slate-500">AMOUNT (IDR)</th>
                   <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600">DEDUCTIONS (POTONGAN)</th>
                   <th class="text-right py-2 px-3 font-semibold w-[16%]">AMOUNT (IDR)</th>
@@ -518,7 +557,7 @@
                 <!-- Row 1 -->
                 <tr>
                   <td class="py-1.5 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">Gaji Dasar (Base Salary)</div>
+                    <div class="font-medium text-slate-800" id="lblBase">Gaji Dasar (Base Salary)</div>
                     <div class="text-[9px] text-slate-500" id="subBase">Full: Rp 23.850.000 (14/23 hr)</div>
                   </td>
                   <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valBase">Rp 14.517.391</td>
@@ -531,7 +570,7 @@
 
                 <!-- Row 2 -->
                 <tr class="bg-slate-50/60">
-                  <td class="py-1.5 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200" id="earnCellRow2">
                     <div class="font-medium text-slate-800">Tunjangan Posisi (Positional)</div>
                     <div class="text-[9px] text-slate-500" id="subPos">Full: Rp 5.000.000 (14/23 hr)</div>
                   </td>
@@ -543,8 +582,8 @@
                   <td class="py-1.5 px-3 text-right font-medium tabular-nums" id="valOtherDed">Rp 0</td>
                 </tr>
 
-                <!-- Row 3 -->
-                <tr>
+                <!-- Row 3 (PKWT Only) -->
+                <tr class="pkwt-table-row">
                   <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Rumah (Housing)</div>
                     <div class="text-[9px] text-slate-500" id="subHousing">Full: Rp 0 (14/23 hr)</div>
@@ -556,8 +595,8 @@
                   <td class="py-1.5 px-3 text-right text-slate-400 text-[9.5px]">Non-Deduction</td>
                 </tr>
 
-                <!-- Row 4 -->
-                <tr class="bg-slate-50/60">
+                <!-- Row 4 (PKWT Only) -->
+                <tr class="bg-slate-50/60 pkwt-table-row">
                   <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Transport</div>
                     <div class="text-[9px] text-slate-500" id="subTrans">Full: Rp 1.500.000 (14/23 hr hadir)</div>
@@ -567,8 +606,8 @@
                   <td class="py-1.5 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- Row 5 -->
-                <tr>
+                <!-- Row 5 (PKWT Only) -->
+                <tr class="pkwt-table-row">
                   <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Kehadiran</div>
                     <div class="text-[9px] text-slate-500" id="subAtt">Full: Rp 1.500.000 (14/23 hr hadir)</div>
@@ -578,8 +617,8 @@
                   <td class="py-1.5 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- Row 6: BPJS Kesehatan Benefit (Full) -->
-                <tr class="bg-emerald-50/60">
+                <!-- Row 6: BPJS Kesehatan Benefit (Full - PKWT Only) -->
+                <tr class="bg-emerald-50/60 pkwt-table-row">
                   <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-semibold text-emerald-950">Tunjangan BPJS Kesehatan (Benefit)</div>
                     <div class="text-[9px] text-emerald-700">Benefit Kepesertaan Mandiri (Dibayar Full)</div>
@@ -653,7 +692,7 @@
 
             <div class="text-center">
               <p class="text-slate-600 font-medium">Diterima oleh,</p>
-              <p class="text-[9.5px] text-slate-500 mb-12">Karyawan</p>
+              <p class="text-[9.5px] text-slate-500 mb-12" id="viewReceiverRoleLabel">Karyawan</p>
               <div class="w-52 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewReceiverName">Yohan Kurniawan</div>
               <p class="text-[9.5px] text-slate-500 mt-0.5" id="viewReceiverTitle">Senior Operation and People Manager</p>
             </div>
@@ -858,9 +897,57 @@
       updatePayslip();
     }
 
+    // Toggle override manual pajak Consultant
+    function onConsultantTaxToggle() {
+      const isManual = document.getElementById('consultantManualTaxToggle').checked;
+      document.getElementById('consultantManualTaxWrap').classList.toggle('hidden', !isManual);
+      updatePayslip();
+    }
+
+    // Toggle UI berdasarkan Status Karyawan (PKWT/PKWTT vs Consultant)
+    function onEmploymentStatusChange() {
+      const status = document.getElementById('empStatus').value;
+      const isConsultant = status === 'Consultant';
+
+      // Label input nama & kehadiran
+      document.getElementById('lblEmpNameInput').textContent = isConsultant ? 'Nama Konsultan' : 'Nama Karyawan';
+      document.getElementById('attendanceBadgeSubtitle').textContent = isConsultant
+        ? 'Tidak Peduli Sabtu/Minggu'
+        : 'Dasar Hitung Prorata';
+      document.getElementById('lblPresentDaysInput').textContent = isConsultant
+        ? 'Total Hari Bekerja'
+        : 'Jumlah Hadir';
+      document.getElementById('salarySectionHeading').textContent = isConsultant
+        ? '3. Fee / Gaji Dasar Konsultan (Full Rate - Rp)'
+        : '3. Gaji & Benefit Bulanan (Full Rate - Rp)';
+      document.getElementById('lblBaseSalaryInput').textContent = isConsultant
+        ? 'Fee / Gaji Dasar Konsultan (Bulanan)'
+        : 'Gaji Dasar (Base Salary)';
+
+      // Sembunyikan field khusus PKWT/PKWTT saat mode Consultant
+      document.getElementById('ptkpFieldGroup').classList.toggle('hidden', isConsultant);
+      document.getElementById('monthsWorkedFieldGroup').classList.toggle('hidden', isConsultant);
+      document.getElementById('leaveFieldGroup').classList.toggle('hidden', isConsultant);
+      document.getElementById('absentFieldGroup').classList.toggle('hidden', isConsultant);
+      document.getElementById('plFieldGroup').classList.toggle('hidden', isConsultant);
+
+      document.querySelectorAll('.pkwt-only-field').forEach((el) => {
+        el.classList.toggle('hidden', isConsultant);
+      });
+
+      // Kontrol pajak PKWT vs Consultant
+      document.getElementById('pkwtTaxControls').classList.toggle('hidden', isConsultant);
+      document.getElementById('consultantTaxControls').classList.toggle('hidden', !isConsultant);
+
+      updatePayslip();
+    }
+
     // Kalkulasi Lengkap & Render Payslip
     function updatePayslip() {
-      // 1. Data Identitas
+      // 1. Data Identitas & Status
+      const empStatus = document.getElementById('empStatus').value || 'PKWT/PKWTT';
+      const isConsultant = empStatus === 'Consultant';
+
       const empName = document.getElementById('empName').value || '-';
       const empTitle = document.getElementById('empTitle').value || '-';
       const empId = document.getElementById('empId').value || '-';
@@ -879,43 +966,29 @@
 
       const ptkpMeta = getPtkpInfo(empPtkp);
 
-      // 2. Data Kehadiran & Aturan Prorata
+      // 2. Data Kehadiran
       const totalDays = Math.max(1, parseFloat(document.getElementById('totalDays').value) || 1);
       const presentDays = Math.max(0, parseFloat(document.getElementById('presentDays').value) || 0);
-      const leaveDays = Math.max(0, parseFloat(document.getElementById('leaveDays').value) || 0);
-      const absentDays = Math.max(0, parseFloat(document.getElementById('absentDays').value) || 0);
-      const plDays = Math.max(0, parseFloat(document.getElementById('plDays').value) || 0);
-
-      // Gaji Dasar, Tj. Posisi, Tj. Rumah: Hadir + Cuti/Sakit - Mangkir
-      const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
-      const fixedRatio = fixedPaidDays / totalDays;
-
-      // Tj. Transport & Tj. Kehadiran: Hadir - Mangkir (Cuti/Sakit juga memotong)
-      const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
-      const dailyRatio = dailyPaidDays / totalDays;
+      const leaveDays = isConsultant ? 0 : Math.max(0, parseFloat(document.getElementById('leaveDays').value) || 0);
+      const absentDays = isConsultant ? 0 : Math.max(0, parseFloat(document.getElementById('absentDays').value) || 0);
+      const plDays = isConsultant ? 0 : Math.max(0, parseFloat(document.getElementById('plDays').value) || 0);
 
       // 3. Komponen Gaji & Benefit
       const fullBase = parseFloat(document.getElementById('baseSalary').value) || 0;
-      const fullPos = parseFloat(document.getElementById('posAllowance').value) || 0;
-      const fullHousing = parseFloat(document.getElementById('housingAllowance').value) || 0;
-      const fullTrans = parseFloat(document.getElementById('transAllowance').value) || 0;
-      const fullAtt = parseFloat(document.getElementById('attAllowance').value) || 0;
-      // BPJS Kesehatan adalah BENEFIT mandiri: dibayar FULL (tidak diprorata)
-      const valBpjsBen = Math.round(parseFloat(document.getElementById('bpjsBenefit').value) || 0);
+      const fullPos = isConsultant ? 0 : (parseFloat(document.getElementById('posAllowance').value) || 0);
+      const fullHousing = isConsultant ? 0 : (parseFloat(document.getElementById('housingAllowance').value) || 0);
+      const fullTrans = isConsultant ? 0 : (parseFloat(document.getElementById('transAllowance').value) || 0);
+      const fullAtt = isConsultant ? 0 : (parseFloat(document.getElementById('attAllowance').value) || 0);
+      const valBpjsBen = isConsultant ? 0 : Math.round(parseFloat(document.getElementById('bpjsBenefit').value) || 0);
 
-      const valBase = Math.round(fullBase * fixedRatio);
-      const valPos = Math.round(fullPos * fixedRatio);
-      const valHousing = Math.round(fullHousing * fixedRatio);
-      const valTrans = Math.round(fullTrans * dailyRatio);
-      const valAtt = Math.round(fullAtt * dailyRatio);
-
-      // Total Penghasilan Kerja & Benefit Periode Ini (sebelum koreksi pajak)
-      const periodWorkAndBenefitGross = valBase + valPos + valHousing + valTrans + valAtt + valBpjsBen;
-
-      // 4. Perhitungan PPh 21 sesuai Mode Pajak
-      const taxMode = document.getElementById('taxMode').value;
       const valOtherDed = Math.round(parseFloat(document.getElementById('otherDeduction').value) || 0);
 
+      let valBase = 0;
+      let valPos = 0;
+      let valHousing = 0;
+      let valTrans = 0;
+      let valAtt = 0;
+      let periodWorkAndBenefitGross = 0;
       let pph21Deduction = 0;
       let pph21RefundCredit = 0;
       let taxDedLabel = '';
@@ -923,65 +996,119 @@
       let taxRefundSub = '';
       let taxNoteHTML = '';
 
-      if (taxMode === 'TER') {
-        const terRate = getTerRate(periodWorkAndBenefitGross, ptkpMeta.category);
-        pph21Deduction = Math.round(periodWorkAndBenefitGross * terRate);
-        const pctStr = (terRate * 100).toFixed(2).replace('.', ',');
+      if (isConsultant) {
+        // MODE CONSULTANT: Tidak peduli Sabtu/Minggu -> Total Hari Bekerja / Working Days
+        const consultantRatio = presentDays / totalDays;
+        valBase = Math.round(fullBase * consultantRatio);
+        periodWorkAndBenefitGross = valBase;
 
-        taxDedLabel = `PPh Pasal 21 (TER Kategori ${ptkpMeta.category})`;
-        taxDedSub = `Tarif Efektif ${pctStr}% × Bruto ${formatIDR(periodWorkAndBenefitGross)}`;
-
-        taxNoteHTML = `
-          <strong>Catatan Pajak PPh 21 (PP 58/2023 &amp; PMK 168/2023):</strong> Pemotongan bulan berjalan menggunakan Tarif Efektif Bulanan (TER Kategori ${ptkpMeta.category} — ${empPtkp}) sebesar <strong>${pctStr}%</strong> (${formatIDR(pph21Deduction)}). Karena karyawan bergabung pada <strong>${empJoinDate}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong> di 2026, tidak disetahunkan), apabila akumulasi bruto ${monthsWorkedYear} bulan masih di bawah PTKP Tahunan <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong>, maka pemotongan PPh 21 ini akan dikembalikan penuh (<em>tax refund</em>) pada rekonsiliasi masa pajak Desember 2026.
-        `;
-      } else if (taxMode === 'RECON') {
-        const priorGross = Math.max(0, parseFloat(document.getElementById('priorGrossAccum').value) || 0);
-        const priorTaxWithheld = Math.max(0, parseFloat(document.getElementById('priorTaxWithheld').value) || 0);
-
-        const totalAnnualGross = priorGross + periodWorkAndBenefitGross;
-        // Biaya Jabatan: 5% dari bruto, maksimal Rp 500.000 per bulan bekerja
-        const maxBiayaJabatan = 500000 * monthsWorkedYear;
-        const biayaJabatan = Math.min(maxBiayaJabatan, Math.round(totalAnnualGross * 0.05));
-        const netAnnualIncome = Math.max(0, totalAnnualGross - biayaJabatan);
-        const pkpAnnual = Math.max(0, netAnnualIncome - ptkpMeta.annualPtkp);
-        const annualTaxDue = calculatePasal17Tax(pkpAnnual);
-
-        const taxDiff = annualTaxDue - priorTaxWithheld;
-        if (taxDiff >= 0) {
-          pph21Deduction = taxDiff;
-          pph21RefundCredit = 0;
+        const isManualTax = document.getElementById('consultantManualTaxToggle').checked;
+        if (isManualTax) {
+          pph21Deduction = Math.max(0, Math.round(parseFloat(document.getElementById('consultantManualTaxAmount').value) || 0));
+          taxDedLabel = 'PPh 21 Konsultan (Manual)';
+          taxDedSub = 'Penyesuaian Nominal Pajak Konsultan';
         } else {
-          pph21Deduction = 0;
-          pph21RefundCredit = Math.abs(taxDiff);
+          // Total hari bekerja / working days x base fee x 2,5%
+          pph21Deduction = Math.round(periodWorkAndBenefitGross * 0.025);
+          taxDedLabel = 'PPh 21 Konsultan (2,5% × Penghasilan Bruto)';
+          taxDedSub = `2,5% × ${formatIDR(periodWorkAndBenefitGross)} (${presentDays}/${totalDays} hr)`;
         }
 
-        taxDedLabel = `PPh Pasal 21 (Rekonsiliasi ${monthsWorkedYear} Bulan)`;
-        taxDedSub = `PPh Terutang Setahun: ${formatIDR(annualTaxDue)}`;
-        taxRefundSub = `Lebih Potong Nov (${formatIDR(priorTaxWithheld)}) − Terutang (${formatIDR(annualTaxDue)})`;
-
-        document.getElementById('reconPreviewSummary').innerHTML = `
-          Total Bruto ${monthsWorkedYear} Bln: <strong>${formatIDR(totalAnnualGross)}</strong> | Biaya Jabatan: <strong>${formatIDR(biayaJabatan)}</strong> | PTKP ${empPtkp}: <strong>${formatIDR(ptkpMeta.annualPtkp)}</strong> | PKP: <strong>${formatIDR(pkpAnnual)}</strong> | PPh Terutang Setahun: <strong>${formatIDR(annualTaxDue)}</strong> ${pph21RefundCredit > 0 ? `→ <span class="text-emerald-700 font-bold">Refund +${formatIDR(pph21RefundCredit)}</span>` : ''}
+        const ratioPct = (consultantRatio * 100).toFixed(2);
+        document.getElementById('attendanceRuleInfo').innerHTML = `
+          <div>• <strong>Skema Consultant (Tidak Peduli Sabtu/Minggu):</strong> Fee dihitung proporsional berdasarkan <strong>Total Hari Bekerja ÷ Working Days (${presentDays} / ${totalDays} hari = ${ratioPct}%)</strong> = <strong>${formatIDR(valBase)}</strong>.</div>
+          <div>• <strong>PPh 21 Konsultan:</strong> <strong>2,5% × Penghasilan Bruto</strong> (${formatIDR(valBase)} × 2,5% = <strong>${formatIDR(pph21Deduction)}</strong>).</div>
+          <div>• Tanpa tunjangan jabatan/rumah/transport/kehadiran, BPJS mandiri, cuti/sakit, mangkir, maupun PL.</div>
         `;
 
         taxNoteHTML = `
-          <strong>Rekonsiliasi PPh 21 Masa Pajak Terakhir (PMK 168/2023 Pasal 15 &amp; 21 — ${monthsWorkedYear} Bulan Kerja):</strong> Total bruto ${monthsWorkedYear} bulan (${formatIDR(totalAnnualGross)}) dikurangi Biaya Jabatan (${formatIDR(biayaJabatan)}) menghasilkan neto <strong>${formatIDR(netAnnualIncome)}</strong>, masih di bawah PTKP penuh <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong> sehingga PKP = <strong>Rp 0</strong> dan PPh 21 terutang setahun = <strong>Rp 0</strong>. Kelebihan pemotongan PPh 21 masa sebelumnya sebesar <strong>${formatIDR(pph21RefundCredit)}</strong> dikreditkan kembali ke THP karyawan.
+          <strong>Catatan Pajak PPh 21 Konsultan / Bukan Pegawai (PMK 168/2023):</strong> Penghasilan bruto konsultan dihitung dari rasio hari bekerja <strong>(${presentDays} / ${totalDays} hari kerja)</strong> tanpa membedakan hari akhir pekan (Sabtu/Minggu), dikenakan pemotongan PPh Pasal 21 dengan tarif efektif <strong>2,5%</strong> (50% × tarif lapisan pertama 5% Pasal 17 UU PPh) sebesar <strong>${formatIDR(pph21Deduction)}</strong>.
         `;
       } else {
-        const manualVal = Math.round(parseFloat(document.getElementById('manualTaxAmount').value) || 0);
-        if (manualVal >= 0) {
-          pph21Deduction = manualVal;
-          pph21RefundCredit = 0;
+        // MODE PKWT/PKWTT
+        const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
+        const fixedRatio = fixedPaidDays / totalDays;
+
+        const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
+        const dailyRatio = dailyPaidDays / totalDays;
+
+        valBase = Math.round(fullBase * fixedRatio);
+        valPos = Math.round(fullPos * fixedRatio);
+        valHousing = Math.round(fullHousing * fixedRatio);
+        valTrans = Math.round(fullTrans * dailyRatio);
+        valAtt = Math.round(fullAtt * dailyRatio);
+
+        periodWorkAndBenefitGross = valBase + valPos + valHousing + valTrans + valAtt + valBpjsBen;
+
+        const taxMode = document.getElementById('taxMode').value;
+
+        if (taxMode === 'TER') {
+          const terRate = getTerRate(periodWorkAndBenefitGross, ptkpMeta.category);
+          pph21Deduction = Math.round(periodWorkAndBenefitGross * terRate);
+          const pctStr = (terRate * 100).toFixed(2).replace('.', ',');
+
+          taxDedLabel = `PPh Pasal 21 (TER Kategori ${ptkpMeta.category})`;
+          taxDedSub = `Tarif Efektif ${pctStr}% × Bruto ${formatIDR(periodWorkAndBenefitGross)}`;
+
+          taxNoteHTML = `
+            <strong>Catatan Pajak PPh 21 (PP 58/2023 &amp; PMK 168/2023):</strong> Pemotongan bulan berjalan menggunakan Tarif Efektif Bulanan (TER Kategori ${ptkpMeta.category} — ${empPtkp}) sebesar <strong>${pctStr}%</strong> (${formatIDR(pph21Deduction)}). Karena karyawan bergabung pada <strong>${empJoinDate}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong> di 2026, tidak disetahunkan), apabila akumulasi bruto ${monthsWorkedYear} bulan masih di bawah PTKP Tahunan <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong>, maka pemotongan PPh 21 ini akan dikembalikan penuh (<em>tax refund</em>) pada rekonsiliasi masa pajak Desember 2026.
+          `;
+        } else if (taxMode === 'RECON') {
+          const priorGross = Math.max(0, parseFloat(document.getElementById('priorGrossAccum').value) || 0);
+          const priorTaxWithheld = Math.max(0, parseFloat(document.getElementById('priorTaxWithheld').value) || 0);
+
+          const totalAnnualGross = priorGross + periodWorkAndBenefitGross;
+          const maxBiayaJabatan = 500000 * monthsWorkedYear;
+          const biayaJabatan = Math.min(maxBiayaJabatan, Math.round(totalAnnualGross * 0.05));
+          const netAnnualIncome = Math.max(0, totalAnnualGross - biayaJabatan);
+          const pkpAnnual = Math.max(0, netAnnualIncome - ptkpMeta.annualPtkp);
+          const annualTaxDue = calculatePasal17Tax(pkpAnnual);
+
+          const taxDiff = annualTaxDue - priorTaxWithheld;
+          if (taxDiff >= 0) {
+            pph21Deduction = taxDiff;
+            pph21RefundCredit = 0;
+          } else {
+            pph21Deduction = 0;
+            pph21RefundCredit = Math.abs(taxDiff);
+          }
+
+          taxDedLabel = `PPh Pasal 21 (Rekonsiliasi ${monthsWorkedYear} Bulan)`;
+          taxDedSub = `PPh Terutang Setahun: ${formatIDR(annualTaxDue)}`;
+          taxRefundSub = `Lebih Potong Nov (${formatIDR(priorTaxWithheld)}) − Terutang (${formatIDR(annualTaxDue)})`;
+
+          document.getElementById('reconPreviewSummary').innerHTML = `
+            Total Bruto ${monthsWorkedYear} Bln: <strong>${formatIDR(totalAnnualGross)}</strong> | Biaya Jabatan: <strong>${formatIDR(biayaJabatan)}</strong> | PTKP ${empPtkp}: <strong>${formatIDR(ptkpMeta.annualPtkp)}</strong> | PKP: <strong>${formatIDR(pkpAnnual)}</strong> | PPh Terutang Setahun: <strong>${formatIDR(annualTaxDue)}</strong> ${pph21RefundCredit > 0 ? `→ <span class="text-emerald-700 font-bold">Refund +${formatIDR(pph21RefundCredit)}</span>` : ''}
+          `;
+
+          taxNoteHTML = `
+            <strong>Rekonsiliasi PPh 21 Masa Pajak Terakhir (PMK 168/2023 Pasal 15 &amp; 21 — ${monthsWorkedYear} Bulan Kerja):</strong> Total bruto ${monthsWorkedYear} bulan (${formatIDR(totalAnnualGross)}) dikurangi Biaya Jabatan (${formatIDR(biayaJabatan)}) menghasilkan neto <strong>${formatIDR(netAnnualIncome)}</strong>, masih di bawah PTKP penuh <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong> sehingga PKP = <strong>Rp 0</strong> dan PPh 21 terutang setahun = <strong>Rp 0</strong>. Kelebihan pemotongan PPh 21 masa sebelumnya sebesar <strong>${formatIDR(pph21RefundCredit)}</strong> dikreditkan kembali ke THP karyawan.
+          `;
         } else {
-          pph21Deduction = 0;
-          pph21RefundCredit = Math.abs(manualVal);
+          const manualVal = Math.round(parseFloat(document.getElementById('manualTaxAmount').value) || 0);
+          if (manualVal >= 0) {
+            pph21Deduction = manualVal;
+            pph21RefundCredit = 0;
+          } else {
+            pph21Deduction = 0;
+            pph21RefundCredit = Math.abs(manualVal);
+          }
+
+          taxDedLabel = `PPh Pasal 21 (Penyesuaian Manual)`;
+          taxDedSub = `Status ${empPtkp} (TER Kategori ${ptkpMeta.category})`;
+          taxRefundSub = `Kredit / Pengembalian Pajak Manual`;
+
+          taxNoteHTML = `
+            <strong>Catatan Pajak PPh 21:</strong> Perhitungan PPh 21 disesuaikan secara manual dengan status PTKP <strong>${empPtkp}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong>, tidak disetahunkan sesuai ketentuan Wajib Pajak Dalam Negeri yang mulai bekerja di tengah tahun kalender).
+          `;
         }
 
-        taxDedLabel = `PPh Pasal 21 (Penyesuaian Manual)`;
-        taxDedSub = `Status ${empPtkp} (TER Kategori ${ptkpMeta.category})`;
-        taxRefundSub = `Kredit / Pengembalian Pajak Manual`;
-
-        taxNoteHTML = `
-          <strong>Catatan Pajak PPh 21:</strong> Perhitungan PPh 21 disesuaikan secara manual dengan status PTKP <strong>${empPtkp}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong>, tidak disetahunkan sesuai ketentuan Wajib Pajak Dalam Negeri yang mulai bekerja di tengah tahun kalender).
+        const fixedPct = (fixedRatio * 100).toFixed(2);
+        const dailyPct = (dailyRatio * 100).toFixed(2);
+        document.getElementById('attendanceRuleInfo').innerHTML = `
+          <div>• <strong>Gaji Dasar, Tj. Posisi &amp; Tj. Rumah:</strong> dibayar <strong class="text-slate-900">${fixedPaidDays} / ${totalDays} hari</strong> (${fixedPct}%) — <em>Cuti/Sakit dibayar, Mangkir dipotong</em>.</div>
+          <div>• <strong>Tj. Transport &amp; Tj. Kehadiran:</strong> dibayar <strong class="text-slate-900">${dailyPaidDays} / ${totalDays} hari</strong> (${dailyPct}%) — <em>Cuti/Sakit &amp; Mangkir dipotong</em>.</div>
+          <div>• <strong>BPJS Kesehatan:</strong> dibayar <strong>Full (${formatIDR(valBpjsBen)})</strong> sebagai Benefit Mandiri.</div>
         `;
       }
 
@@ -990,56 +1117,105 @@
       const totalDeductions = pph21Deduction + valOtherDed;
       const netPay = Math.max(0, totalGrossEarnings - totalDeductions);
 
-      // 6. Update Tampilan Panel Kiri (Info Rumus)
-      const fixedPct = (fixedRatio * 100).toFixed(2);
-      const dailyPct = (dailyRatio * 100).toFixed(2);
-      document.getElementById('attendanceRuleInfo').innerHTML = `
-        <div>• <strong>Gaji Dasar, Tj. Posisi &amp; Tj. Rumah:</strong> dibayar <strong class="text-slate-900">${fixedPaidDays} / ${totalDays} hari</strong> (${fixedPct}%) — <em>Cuti/Sakit dibayar, Mangkir dipotong</em>.</div>
-        <div>• <strong>Tj. Transport &amp; Tj. Kehadiran:</strong> dibayar <strong class="text-slate-900">${dailyPaidDays} / ${totalDays} hari</strong> (${dailyPct}%) — <em>Cuti/Sakit &amp; Mangkir dipotong</em>.</div>
-        <div>• <strong>BPJS Kesehatan:</strong> dibayar <strong>Full (${formatIDR(valBpjsBen)})</strong> sebagai Benefit Mandiri.</div>
-      `;
-
-      // 7. Update Dokumen A4
+      // 6. Update Dokumen A4 (Header, Identitas & Role)
+      document.getElementById('docMainBannerTitle').textContent = isConsultant
+        ? 'SLIP PEMBAYARAN KONSULTAN / CONSULTANT PAYSLIP'
+        : 'SLIP GAJI KARYAWAN / EMPLOYEE PAYSLIP';
       document.getElementById('docPeriodBadge').textContent = `Periode: ${payPeriod}`;
+
+      document.getElementById('viewEmpNameLabel').textContent = isConsultant ? 'Nama Konsultan' : 'Nama Karyawan';
       document.getElementById('viewEmpName').textContent = empName;
       document.getElementById('viewEmpTitle').textContent = empTitle;
+      document.getElementById('viewEmpStatus').textContent = empStatus;
       document.getElementById('viewEmpId').textContent = empId;
       document.getElementById('viewEmpNpwp').textContent = empNpwp || '-';
       document.getElementById('viewEmpBank').textContent = empBankDisplay;
       document.getElementById('viewPayPeriod').textContent = payPeriod;
       document.getElementById('viewPayDate').textContent = payDate;
       document.getElementById('viewJoinDate').textContent = empJoinDate;
+
+      document.getElementById('viewPtkpRow').classList.toggle('hidden', isConsultant);
+      document.getElementById('viewMonthsWorkedRow').classList.toggle('hidden', isConsultant);
       document.getElementById('viewEmpPtkp').textContent = `${empPtkp} (TER Kategori ${ptkpMeta.category})`;
       document.getElementById('viewMonthsWorked').textContent = `${monthsWorkedYear} Bulan (Tahun Berjalan)`;
 
       // Strip Kehadiran
+      const stripContainer = document.getElementById('attendanceStripContainer');
+      const stripPresentBox = document.getElementById('stripPresentBox');
+      const stripConsultantNoteBox = document.getElementById('stripConsultantNoteBox');
+
       document.getElementById('stripTotalDays').textContent = `${totalDays} Hari`;
       document.getElementById('stripPresentDays').textContent = `${presentDays} Hari`;
-      document.getElementById('stripLeaveDays').textContent = `${leaveDays} Hari`;
-      document.getElementById('stripAbsentDays').textContent = `${absentDays} Hari`;
-      document.getElementById('stripPlDays').textContent = `${plDays} Hari`;
 
-      // Earnings & Benefits
-      document.getElementById('valBase').textContent = formatIDR(valBase);
-      document.getElementById('subBase').textContent = `Full: ${formatIDR(fullBase)} (${fixedPaidDays}/${totalDays} hr)`;
+      if (isConsultant) {
+        stripContainer.classList.remove('grid-cols-5');
+        stripContainer.classList.add('grid-cols-4');
+        document.getElementById('stripPresentLabel').textContent = 'Total Hari Bekerja';
+        stripPresentBox.classList.add('border-r', 'border-slate-300');
+        document.querySelectorAll('.pkwt-strip-col').forEach((el) => el.classList.add('hidden'));
+        stripConsultantNoteBox.classList.remove('hidden');
+        stripConsultantNoteBox.classList.add('col-span-2');
+        const pctConsultant = ((presentDays / totalDays) * 100).toFixed(2);
+        document.getElementById('stripConsultantRatioText').textContent =
+          `Rasio Hari Bekerja: ${presentDays} / ${totalDays} hari kerja (${pctConsultant}%) — tidak peduli Sabtu/Minggu`;
+      } else {
+        stripContainer.classList.remove('grid-cols-4');
+        stripContainer.classList.add('grid-cols-5');
+        document.getElementById('stripPresentLabel').textContent = 'Hadir';
+        document.querySelectorAll('.pkwt-strip-col').forEach((el) => el.classList.remove('hidden'));
+        stripConsultantNoteBox.classList.add('hidden');
+        stripConsultantNoteBox.classList.remove('col-span-2');
 
-      document.getElementById('valPos').textContent = formatIDR(valPos);
-      document.getElementById('subPos').textContent = `Full: ${formatIDR(fullPos)} (${fixedPaidDays}/${totalDays} hr)`;
+        document.getElementById('stripLeaveDays').textContent = `${leaveDays} Hari`;
+        document.getElementById('stripAbsentDays').textContent = `${absentDays} Hari`;
+        document.getElementById('stripPlDays').textContent = `${plDays} Hari`;
+      }
 
-      document.getElementById('valHousing').textContent = formatIDR(valHousing);
-      document.getElementById('subHousing').textContent = `Full: ${formatIDR(fullHousing)} (${fixedPaidDays}/${totalDays} hr)`;
+      // Tabel Earnings & Deductions
+      document.getElementById('tblEarningsHeader').textContent = isConsultant
+        ? 'CONSULTANT FEE / EARNINGS'
+        : 'EARNINGS & BENEFITS';
 
-      document.getElementById('valTrans').textContent = formatIDR(valTrans);
-      document.getElementById('subTrans').textContent = `Full: ${formatIDR(fullTrans)} (${dailyPaidDays}/${totalDays} hr hadir)`;
+      document.querySelectorAll('.pkwt-table-row').forEach((el) => {
+        el.classList.toggle('hidden', isConsultant);
+      });
 
-      document.getElementById('valAtt').textContent = formatIDR(valAtt);
-      document.getElementById('subAtt').textContent = `Full: ${formatIDR(fullAtt)} (${dailyPaidDays}/${totalDays} hr hadir)`;
+      if (isConsultant) {
+        document.getElementById('lblBase').textContent = 'Fee / Gaji Dasar Konsultan';
+        document.getElementById('subBase').textContent = `Full: ${formatIDR(fullBase)} (${presentDays}/${totalDays} hr bekerja)`;
+        document.getElementById('valBase').textContent = formatIDR(valBase);
 
-      document.getElementById('valBpjsBen').textContent = formatIDR(valBpjsBen);
+        document.getElementById('earnCellRow2').innerHTML = `<span class="text-slate-400">-</span>`;
+        document.getElementById('valPos').textContent = '-';
+      } else {
+        const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
+        const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
+
+        document.getElementById('lblBase').textContent = 'Gaji Dasar (Base Salary)';
+        document.getElementById('subBase').textContent = `Full: ${formatIDR(fullBase)} (${fixedPaidDays}/${totalDays} hr)`;
+        document.getElementById('valBase').textContent = formatIDR(valBase);
+
+        document.getElementById('earnCellRow2').innerHTML = `
+          <div class="font-medium text-slate-800">Tunjangan Posisi (Positional)</div>
+          <div class="text-[9px] text-slate-500" id="subPos">Full: ${formatIDR(fullPos)} (${fixedPaidDays}/${totalDays} hr)</div>
+        `;
+        document.getElementById('valPos').textContent = formatIDR(valPos);
+
+        document.getElementById('valHousing').textContent = formatIDR(valHousing);
+        document.getElementById('subHousing').textContent = `Full: ${formatIDR(fullHousing)} (${fixedPaidDays}/${totalDays} hr)`;
+
+        document.getElementById('valTrans').textContent = formatIDR(valTrans);
+        document.getElementById('subTrans').textContent = `Full: ${formatIDR(fullTrans)} (${dailyPaidDays}/${totalDays} hr hadir)`;
+
+        document.getElementById('valAtt').textContent = formatIDR(valAtt);
+        document.getElementById('subAtt').textContent = `Full: ${formatIDR(fullAtt)} (${dailyPaidDays}/${totalDays} hr hadir)`;
+
+        document.getElementById('valBpjsBen').textContent = formatIDR(valBpjsBen);
+      }
 
       // Baris Pengembalian Pajak (Refund)
       const refundRow = document.getElementById('taxRefundRow');
-      if (pph21RefundCredit > 0) {
+      if (!isConsultant && pph21RefundCredit > 0) {
         refundRow.classList.remove('hidden');
         document.getElementById('valTaxRefund').textContent = formatIDR(pph21RefundCredit);
         document.getElementById('subTaxRefund').textContent = taxRefundSub;
@@ -1061,23 +1237,32 @@
       const words = terbilang(netPay).replace(/\s+/g, ' ').trim();
       document.getElementById('valTerbilang').textContent = `Terbilang: ${words ? words + ' Rupiah' : 'Nol Rupiah'}`;
 
-      // Kotak Hak Pengganti Libur (PL) — tampil bila PL > 0
+      // Kotak Hak Pengganti Libur (PL) — tampil bila bukan Consultant & PL > 0
       const plBox = document.getElementById('plEntitlementBox');
-      if (plDays > 0) {
+      if (!isConsultant && plDays > 0) {
         plBox.classList.remove('hidden');
         document.getElementById('plEntitlementText').innerHTML = `Karyawan berhak atas sejumlah <strong>${plDays} hari Pengganti Libur (PL)</strong> di bulan ini atas penugasan/kehadiran kerja di hari akhir pekan (weekend).`;
       } else {
         plBox.classList.add('hidden');
       }
 
-      // Catatan Pajak & Aturan Prorata
+      // Catatan Pajak & Aturan Perhitungan
       document.getElementById('taxExplanationBox').innerHTML = taxNoteHTML;
-      document.getElementById('docFootnote').innerHTML = `
-        <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (${fixedPaidDays}/${totalDays} hari) serta dipotong proporsional atas mangkir (${absentDays} hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir (${dailyPaidDays}/${totalDays} hari; cuti/sakit &amp; mangkir memotong tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan penuh sebagai benefit kepesertaan mandiri.
-      `;
+      if (isConsultant) {
+        document.getElementById('docFootnote').innerHTML = `
+          <strong>Keterangan Perhitungan Consultant:</strong> Pembayaran jasa konsultan dihitung secara proporsional berdasarkan total hari bekerja aktual (${presentDays}/${totalDays} hari kerja) tanpa membedakan hari akhir pekan (Sabtu/Minggu), serta dikenakan pemotongan PPh Pasal 21 Konsultan sebesar 2,5% dari penghasilan bruto.
+        `;
+      } else {
+        const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
+        const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
+        document.getElementById('docFootnote').innerHTML = `
+          <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (${fixedPaidDays}/${totalDays} hari) serta dipotong proporsional atas mangkir (${absentDays} hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir (${dailyPaidDays}/${totalDays} hari; cuti/sakit &amp; mangkir memotong tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan penuh sebagai benefit kepesertaan mandiri.
+        `;
+      }
 
       // Tanda Tangan
       document.getElementById('viewApproverName').textContent = approverName;
+      document.getElementById('viewReceiverRoleLabel').textContent = isConsultant ? 'Konsultan' : 'Karyawan';
       document.getElementById('viewReceiverName').textContent = empName;
       document.getElementById('viewReceiverTitle').textContent = empTitle;
     }
@@ -1102,8 +1287,31 @@
       showToast('Logo dikembalikan ke ./logo-aeer.jpg.');
     }
 
+    // Simulasi Cepat Consultant
+    function applyConsultantPreset() {
+      document.getElementById('empStatus').value = 'Consultant';
+      document.getElementById('empName').value = 'Budi Santoso';
+      document.getElementById('empTitle').value = 'Senior Energy Transition Consultant';
+      document.getElementById('empId').value = 'AEER-CNS-2026-014';
+      document.getElementById('empBankName').value = 'Mandiri';
+      document.getElementById('empBankAccount').value = '1270009876543';
+      document.getElementById('empJoinDate').value = '1 November 2026';
+      document.getElementById('payPeriod').value = '26 Oktober – 25 November 2026';
+      document.getElementById('payDate').value = '25 November 2026';
+      document.getElementById('totalDays').value = '23';
+      document.getElementById('presentDays').value = '18';
+      document.getElementById('baseSalary').value = '15000000';
+      document.getElementById('otherDeduction').value = '0';
+      document.getElementById('consultantManualTaxToggle').checked = false;
+      document.getElementById('consultantManualTaxWrap').classList.add('hidden');
+
+      onEmploymentStatusChange();
+      showToast('Simulasi Consultant (18/23 hari kerja & PPh 21 2,5%) diterapkan.');
+    }
+
     // Simulasi Cepat Desember 2026 (Gaji Full + Pengembalian Lebih Potong Pajak November)
     function applyDecemberPreset() {
+      document.getElementById('empStatus').value = 'PKWT/PKWTT';
       document.getElementById('payPeriod').value = '26 November – 25 Desember 2026';
       document.getElementById('payDate').value = '25 Desember 2026';
       document.getElementById('totalDays').value = '22';
@@ -1116,12 +1324,14 @@
       document.getElementById('priorGrossAccum').value = '19536957';
       document.getElementById('priorTaxWithheld').value = '1363478';
 
+      onEmploymentStatusChange();
       onTaxModeChange();
       showToast('Simulasi Desember 2026 (Rekonsiliasi 2 Bulan & Refund PPh 21) diterapkan.');
     }
 
     // Reset Default (November 2026)
     function resetDefaults() {
+      document.getElementById('empStatus').value = 'PKWT/PKWTT';
       document.getElementById('empName').value = 'Yohan Kurniawan';
       document.getElementById('empTitle').value = 'Senior Operation and People Manager';
       document.getElementById('empId').value = 'AEER-2026-1106';
@@ -1151,9 +1361,12 @@
       document.getElementById('priorGrossAccum').value = '19536957';
       document.getElementById('priorTaxWithheld').value = '1363478';
       document.getElementById('manualTaxAmount').value = '0';
+      document.getElementById('consultantManualTaxToggle').checked = false;
+      document.getElementById('consultantManualTaxWrap').classList.add('hidden');
       document.getElementById('otherDeduction').value = '0';
       document.getElementById('approverName').value = 'Pius Ginting';
 
+      onEmploymentStatusChange();
       onTaxModeChange();
       showToast('Data dikembalikan ke pengaturan default November 2026.');
     }
@@ -1163,6 +1376,7 @@
     // =========================================================================
     let employeeMasterList = [
       {
+        status_karyawan: 'PKWT/PKWTT',
         nama: 'Yohan Kurniawan',
         jabatan: 'Senior Operation and People Manager',
         nik: 'AEER-2026-1106',
@@ -1182,6 +1396,28 @@
         cuti_sakit: 0,
         mangkir: 0,
         pl_weekend: 0
+      },
+      {
+        status_karyawan: 'Consultant',
+        nama: 'Budi Santoso',
+        jabatan: 'Senior Energy Transition Consultant',
+        nik: 'AEER-CNS-2026-014',
+        npwp: '12.345.678.9-012.000',
+        bank: 'Mandiri',
+        no_rekening: '1270009876543',
+        status_ptkp: 'TK/0',
+        join_date: '1 November 2026',
+        gaji_dasar: 15000000,
+        tj_posisi: 0,
+        tj_rumah: 0,
+        tj_transport: 0,
+        tj_kehadiran: 0,
+        bpjs_kes: 0,
+        total_hari_kerja: 23,
+        hari_hadir: 18,
+        cuti_sakit: 0,
+        mangkir: 0,
+        pl_weekend: 0
       }
     ];
 
@@ -1195,6 +1431,14 @@
       const cleaned = String(val).replace(/[^0-9.-]/g, '');
       const num = parseFloat(cleaned);
       return isNaN(num) ? fallback : num;
+    }
+
+    function normalizeEmploymentStatus(rawStatus) {
+      const s = String(rawStatus || '').trim().toLowerCase();
+      if (s.includes('consult') || s.includes('konsult') || s.includes('tenaga ahli')) {
+        return 'Consultant';
+      }
+      return 'PKWT/PKWTT';
     }
 
     function mapRawRowToEmployee(rawRow) {
@@ -1212,26 +1456,31 @@
         return '';
       };
 
-      const nama = pick('nama', 'nama_karyawan', 'name', 'employee_name');
+      const nama = pick('nama', 'nama_karyawan', 'nama_konsultan', 'name', 'employee_name');
       if (!nama) return null;
 
+      const statusKaryawan = normalizeEmploymentStatus(
+        pick('status_karyawan', 'status_kontrak', 'tipe_karyawan', 'employment_status', 'jenis_kontrak', 'status')
+      );
+
       return {
+        status_karyawan: statusKaryawan,
         nama,
         jabatan: pick('jabatan', 'posisi', 'title', 'position') || '-',
-        nik: pick('nik', 'id', 'id_karyawan', 'employee_id') || '-',
+        nik: pick('nik', 'id', 'id_karyawan', 'id_kontrak', 'employee_id') || '-',
         npwp: pick('npwp', 'tax_id'),
         bank: pick('bank', 'nama_bank', 'bank_name'),
         no_rekening: pick('no_rekening', 'nomor_rekening', 'rekening', 'account_number', 'no_rek'),
         status_ptkp: (pick('status_ptkp', 'ptkp', 'status_pajak') || 'K/3').toUpperCase(),
-        join_date: pick('join_date', 'tanggal_masuk', 'tgl_masuk') || '6 November 2026',
-        gaji_dasar: parseCleanNumber(normalized.gaji_dasar ?? normalized.base_salary ?? normalized.gaji_pokok, 0),
+        join_date: pick('join_date', 'tanggal_masuk', 'tgl_masuk', 'mulai_kontrak') || '6 November 2026',
+        gaji_dasar: parseCleanNumber(normalized.gaji_dasar ?? normalized.base_salary ?? normalized.gaji_pokok ?? normalized.fee, 0),
         tj_posisi: parseCleanNumber(normalized.tj_posisi ?? normalized.tunjangan_posisi ?? normalized.positional_allowance, 0),
         tj_rumah: parseCleanNumber(normalized.tj_rumah ?? normalized.tunjangan_rumah ?? normalized.housing_allowance, 0),
         tj_transport: parseCleanNumber(normalized.tj_transport ?? normalized.tunjangan_transport ?? normalized.transport_allowance, 0),
         tj_kehadiran: parseCleanNumber(normalized.tj_kehadiran ?? normalized.tunjangan_kehadiran ?? normalized.attendance_allowance, 0),
-        bpjs_kes: parseCleanNumber(normalized.bpjs_kes ?? normalized.bpjs_kesehatan ?? normalized.bpjs, 150000),
-        total_hari_kerja: parseCleanNumber(normalized.total_hari_kerja ?? normalized.hari_kerja, 23),
-        hari_hadir: parseCleanNumber(normalized.hari_hadir ?? normalized.hadir, 23),
+        bpjs_kes: parseCleanNumber(normalized.bpjs_kes ?? normalized.bpjs_kesehatan ?? normalized.bpjs, statusKaryawan === 'Consultant' ? 0 : 150000),
+        total_hari_kerja: parseCleanNumber(normalized.total_hari_kerja ?? normalized.hari_kerja ?? normalized.working_days, 23),
+        hari_hadir: parseCleanNumber(normalized.hari_hadir ?? normalized.hadir ?? normalized.total_hari_bekerja, 23),
         cuti_sakit: parseCleanNumber(normalized.cuti_sakit ?? normalized.cuti ?? normalized.sakit, 0),
         mangkir: parseCleanNumber(normalized.mangkir ?? normalized.alpha, 0),
         pl_weekend: parseCleanNumber(normalized.pl_weekend ?? normalized.pl ?? normalized.lp, 0)
@@ -1247,19 +1496,58 @@
       employeeMasterList.forEach((emp, idx) => {
         const optDatalist = document.createElement('option');
         optDatalist.value = emp.nama;
-        optDatalist.label = `${emp.jabatan} (${emp.nik})`;
+        optDatalist.label = `${emp.jabatan} [${emp.status_karyawan}]`;
         datalist.appendChild(optDatalist);
 
         const optSelect = document.createElement('option');
         optSelect.value = String(idx);
-        optSelect.textContent = emp.nama;
+        optSelect.textContent = `${emp.nama} (${emp.status_karyawan === 'Consultant' ? 'Consultant' : 'PKWT/PKWTT'})`;
         select.appendChild(optSelect);
       });
 
       if (sourceLabel) {
         document.getElementById('masterDataStatus').innerHTML = `
-          <span class="text-emerald-700 font-medium">✓ ${employeeMasterList.length} karyawan dimuat (${sourceLabel}).</span>
+          <span class="text-emerald-700 font-medium">✓ ${employeeMasterList.length} data dimuat (${sourceLabel}).</span>
         `;
+      } else {
+        document.getElementById('masterDataStatus').innerHTML = `
+          <span>Memuat data default (${employeeMasterList.length} contoh: PKWT/PKWTT &amp; Consultant).</span>
+        `;
+      }
+    }
+
+    function applyEmployeeRecord(emp, silent = false) {
+      if (!emp) return;
+      document.getElementById('empStatus').value = emp.status_karyawan || 'PKWT/PKWTT';
+      document.getElementById('empName').value = emp.nama;
+      document.getElementById('employeeSearchInput').value = emp.nama;
+      document.getElementById('empTitle').value = emp.jabatan;
+      document.getElementById('empId').value = emp.nik;
+      document.getElementById('empNpwp').value = emp.npwp || '';
+      document.getElementById('empBankName').value = emp.bank || '';
+      document.getElementById('empBankAccount').value = emp.no_rekening || '';
+      document.getElementById('empJoinDate').value = emp.join_date || '';
+
+      const ptkpSelect = document.getElementById('empPtkp');
+      const validPtkp = Array.from(ptkpSelect.options).some((o) => o.value === emp.status_ptkp);
+      ptkpSelect.value = validPtkp ? emp.status_ptkp : 'K/3';
+
+      document.getElementById('baseSalary').value = emp.gaji_dasar;
+      document.getElementById('posAllowance').value = emp.tj_posisi;
+      document.getElementById('housingAllowance').value = emp.tj_rumah;
+      document.getElementById('transAllowance').value = emp.tj_transport;
+      document.getElementById('attAllowance').value = emp.tj_kehadiran;
+      document.getElementById('bpjsBenefit').value = emp.bpjs_kes;
+
+      document.getElementById('totalDays').value = emp.total_hari_kerja;
+      document.getElementById('presentDays').value = emp.hari_hadir;
+      document.getElementById('leaveDays').value = emp.cuti_sakit;
+      document.getElementById('absentDays').value = emp.mangkir;
+      document.getElementById('plDays').value = emp.pl_weekend;
+
+      onEmploymentStatusChange();
+      if (!silent) {
+        showToast(`Data "${emp.nama}" (${emp.status_karyawan}) otomatis diisi.`);
       }
     }
 
@@ -1367,20 +1655,20 @@
 
     function downloadEmployeeTemplate() {
       const headers = [
-        'nama', 'jabatan', 'nik', 'npwp', 'bank', 'no_rekening',
+        'status_karyawan', 'nama', 'jabatan', 'nik', 'npwp', 'bank', 'no_rekening',
         'status_ptkp', 'join_date', 'gaji_dasar', 'tj_posisi',
         'tj_rumah', 'tj_transport', 'tj_kehadiran', 'bpjs_kes',
         'total_hari_kerja', 'hari_hadir', 'cuti_sakit', 'mangkir', 'pl_weekend'
       ];
       const sampleRow1 = [
-        'Yohan Kurniawan', 'Senior Operation and People Manager', 'AEER-2026-1106',
+        'PKWT/PKWTT', 'Yohan Kurniawan', 'Senior Operation and People Manager', 'AEER-2026-1106',
         '00.000.000.0-000.000', 'BCA', '1234567890', 'K/3', '6 November 2026',
         23850000, 5000000, 0, 1500000, 1500000, 150000, 23, 14, 0, 0, 0
       ];
       const sampleRow2 = [
-        'Siti Rahmawati', 'Research & Policy Analyst', 'AEER-2025-0412',
-        '11.222.333.4-555.000', 'Mandiri', '1270009876543', 'TK/0', '1 April 2025',
-        12000000, 2000000, 0, 1000000, 1000000, 150000, 23, 22, 1, 0, 1
+        'Consultant', 'Budi Santoso', 'Senior Energy Transition Consultant', 'AEER-CNS-2026-014',
+        '12.345.678.9-012.000', 'Mandiri', '1270009876543', '', '1 November 2026',
+        15000000, 0, 0, 0, 0, 0, 23, 18, 0, 0, 0
       ];
 
       const escapeCsv = (v) => {
@@ -1403,7 +1691,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('File template-karyawan-aeer.csv berhasil diunduh!');
+      showToast('File template-karyawan-aeer.csv (PKWT/PKWTT & Consultant) berhasil diunduh!');
     }
 
     async function tryLoadRepoEmployeeCsv() {
@@ -1446,6 +1734,7 @@
     // Inisialisasi saat halaman dimuat
     window.addEventListener('DOMContentLoaded', () => {
       refreshEmployeeDropdowns();
+      onEmploymentStatusChange();
       onTaxModeChange();
       tryLoadRepoEmployeeCsv();
     });
