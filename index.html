@@ -6,6 +6,8 @@
   <title>AEER Payslip Generator — Aksi Ekologi dan Emansipasi Rakyat</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS (XLSX/CSV Parser 100% Client-Side) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <!-- Google Fonts: Inter & Merriweather -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -154,13 +156,55 @@
         </div>
       </div>
 
+      <!-- Master Data Karyawan (CSV / Excel Auto-Fill) -->
+      <div class="bg-sky-50/70 p-3.5 rounded-xl border border-sky-200 space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <label class="block text-xs font-bold text-[#0f2942]">Master Data Karyawan (Auto-Fill)</label>
+            <p class="text-[11px] text-slate-600">Unggah <code class="text-slate-800">.csv</code> / <code class="text-slate-800">.xlsx</code> (100% lokal di browser, aman &amp; privat)</p>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="downloadEmployeeTemplate()" class="px-2.5 py-1.5 text-[11px] font-medium bg-white border border-slate-300 rounded-lg hover:bg-slate-100 text-slate-700 cursor-pointer">
+              Template CSV
+            </button>
+            <label class="px-2.5 py-1.5 text-[11px] font-semibold bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-lg cursor-pointer shadow-xs">
+              Upload CSV/Excel
+              <input type="file" id="employeeFileUpload" accept=".csv,.xlsx,.xls" class="hidden" onchange="handleEmployeeFileUpload(event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+          <div class="sm:col-span-8">
+            <input
+              type="text"
+              id="employeeSearchInput"
+              list="employeeDatalist"
+              placeholder="Ketik atau pilih nama karyawan untuk auto-fill..."
+              oninput="onEmployeeSearchInput(this.value)"
+              onchange="onEmployeeSearchInput(this.value)"
+              class="w-full px-3 py-1.5 text-xs rounded-lg border border-sky-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none font-medium"
+            />
+            <datalist id="employeeDatalist"></datalist>
+          </div>
+          <div class="sm:col-span-4">
+            <select id="employeeQuickSelect" onchange="selectEmployeeByIndex(this.value)" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-sky-300 bg-white text-slate-700 focus:ring-2 focus:ring-[#0284c7] outline-none">
+              <option value="">-- Daftar (1) --</option>
+            </select>
+          </div>
+        </div>
+        <div class="text-[10.5px] text-slate-500 flex items-center justify-between" id="masterDataStatus">
+          <span>Memuat data default (1 karyawan tersedia).</span>
+        </div>
+      </div>
+
       <!-- 1. Identitas Karyawan & Periode -->
       <div class="space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan &amp; Periode</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Nama Karyawan</label>
-            <input type="text" id="empName" value="Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <input type="text" id="empName" value="Yohan Kurniawan" oninput="onDirectNameInput(this.value)" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Jabatan</label>
@@ -175,8 +219,12 @@
             <input type="text" id="empNpwp" placeholder="00.000.000.0-000.000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Rekening Bank</label>
-            <input type="text" id="empBank" value="BCA - Yohan Kurniawan" placeholder="Nama Bank - No. Rekening / Atas Nama" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Nama Bank</label>
+            <input type="text" id="empBankName" value="BCA" placeholder="Contoh: BCA / Mandiri / BNI / BRI" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Nomor Rekening</label>
+            <input type="text" id="empBankAccount" value="" placeholder="Contoh: 1234567890" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none font-mono" />
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Join Date</label>
@@ -396,9 +444,9 @@
                 <span class="text-slate-800" id="viewEmpNpwp">-</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Rekening Bank</span>
+                <span class="w-28 text-slate-500 shrink-0">Bank &amp; No. Rek</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewEmpBank">BCA - Yohan Kurniawan</span>
+                <span class="font-semibold text-slate-800" id="viewEmpBank">BCA</span>
               </div>
             </div>
 
@@ -817,7 +865,11 @@
       const empTitle = document.getElementById('empTitle').value || '-';
       const empId = document.getElementById('empId').value || '-';
       const empNpwp = document.getElementById('empNpwp').value || '-';
-      const empBank = document.getElementById('empBank').value || '-';
+      const empBankName = (document.getElementById('empBankName').value || '').trim();
+      const empBankAccount = (document.getElementById('empBankAccount').value || '').trim();
+      const empBankDisplay = empBankName && empBankAccount
+        ? `${empBankName} — ${empBankAccount}`
+        : (empBankName || empBankAccount || '-');
       const empJoinDate = document.getElementById('empJoinDate').value || '-';
       const payPeriod = document.getElementById('payPeriod').value || '-';
       const payDate = document.getElementById('payDate').value || '-';
@@ -953,7 +1005,7 @@
       document.getElementById('viewEmpTitle').textContent = empTitle;
       document.getElementById('viewEmpId').textContent = empId;
       document.getElementById('viewEmpNpwp').textContent = empNpwp || '-';
-      document.getElementById('viewEmpBank').textContent = empBank || '-';
+      document.getElementById('viewEmpBank').textContent = empBankDisplay;
       document.getElementById('viewPayPeriod').textContent = payPeriod;
       document.getElementById('viewPayDate').textContent = payDate;
       document.getElementById('viewJoinDate').textContent = empJoinDate;
@@ -1074,7 +1126,8 @@
       document.getElementById('empTitle').value = 'Senior Operation and People Manager';
       document.getElementById('empId').value = 'AEER-2026-1106';
       document.getElementById('empNpwp').value = '';
-      document.getElementById('empBank').value = 'BCA - Yohan Kurniawan';
+      document.getElementById('empBankName').value = 'BCA';
+      document.getElementById('empBankAccount').value = '';
       document.getElementById('empJoinDate').value = '6 November 2026';
       document.getElementById('payPeriod').value = '26 Oktober – 25 November 2026';
       document.getElementById('payDate').value = '25 November 2026';
@@ -1105,6 +1158,265 @@
       showToast('Data dikembalikan ke pengaturan default November 2026.');
     }
 
+    // =========================================================================
+    // MASTER DATA KARYAWAN (CSV / EXCEL UPLOAD & AUTO-FILL BY NAME)
+    // =========================================================================
+    let employeeMasterList = [
+      {
+        nama: 'Yohan Kurniawan',
+        jabatan: 'Senior Operation and People Manager',
+        nik: 'AEER-2026-1106',
+        npwp: '',
+        bank: 'BCA',
+        no_rekening: '',
+        status_ptkp: 'K/3',
+        join_date: '6 November 2026',
+        gaji_dasar: 23850000,
+        tj_posisi: 5000000,
+        tj_rumah: 0,
+        tj_transport: 1500000,
+        tj_kehadiran: 1500000,
+        bpjs_kes: 150000,
+        total_hari_kerja: 23,
+        hari_hadir: 14,
+        cuti_sakit: 0,
+        mangkir: 0,
+        pl_weekend: 0
+      }
+    ];
+
+    function normalizeKey(str) {
+      return String(str || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
+    }
+
+    function parseCleanNumber(val, fallback = 0) {
+      if (val === undefined || val === null || val === '') return fallback;
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      const cleaned = String(val).replace(/[^0-9.-]/g, '');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? fallback : num;
+    }
+
+    function mapRawRowToEmployee(rawRow) {
+      const normalized = {};
+      Object.keys(rawRow).forEach((k) => {
+        normalized[normalizeKey(k)] = rawRow[k];
+      });
+
+      const pick = (...keys) => {
+        for (const k of keys) {
+          if (normalized[k] !== undefined && normalized[k] !== null && String(normalized[k]).trim() !== '') {
+            return String(normalized[k]).trim();
+          }
+        }
+        return '';
+      };
+
+      const nama = pick('nama', 'nama_karyawan', 'name', 'employee_name');
+      if (!nama) return null;
+
+      return {
+        nama,
+        jabatan: pick('jabatan', 'posisi', 'title', 'position') || '-',
+        nik: pick('nik', 'id', 'id_karyawan', 'employee_id') || '-',
+        npwp: pick('npwp', 'tax_id'),
+        bank: pick('bank', 'nama_bank', 'bank_name'),
+        no_rekening: pick('no_rekening', 'nomor_rekening', 'rekening', 'account_number', 'no_rek'),
+        status_ptkp: (pick('status_ptkp', 'ptkp', 'status_pajak') || 'K/3').toUpperCase(),
+        join_date: pick('join_date', 'tanggal_masuk', 'tgl_masuk') || '6 November 2026',
+        gaji_dasar: parseCleanNumber(normalized.gaji_dasar ?? normalized.base_salary ?? normalized.gaji_pokok, 0),
+        tj_posisi: parseCleanNumber(normalized.tj_posisi ?? normalized.tunjangan_posisi ?? normalized.positional_allowance, 0),
+        tj_rumah: parseCleanNumber(normalized.tj_rumah ?? normalized.tunjangan_rumah ?? normalized.housing_allowance, 0),
+        tj_transport: parseCleanNumber(normalized.tj_transport ?? normalized.tunjangan_transport ?? normalized.transport_allowance, 0),
+        tj_kehadiran: parseCleanNumber(normalized.tj_kehadiran ?? normalized.tunjangan_kehadiran ?? normalized.attendance_allowance, 0),
+        bpjs_kes: parseCleanNumber(normalized.bpjs_kes ?? normalized.bpjs_kesehatan ?? normalized.bpjs, 150000),
+        total_hari_kerja: parseCleanNumber(normalized.total_hari_kerja ?? normalized.hari_kerja, 23),
+        hari_hadir: parseCleanNumber(normalized.hari_hadir ?? normalized.hadir, 23),
+        cuti_sakit: parseCleanNumber(normalized.cuti_sakit ?? normalized.cuti ?? normalized.sakit, 0),
+        mangkir: parseCleanNumber(normalized.mangkir ?? normalized.alpha, 0),
+        pl_weekend: parseCleanNumber(normalized.pl_weekend ?? normalized.pl ?? normalized.lp, 0)
+      };
+    }
+
+    function refreshEmployeeDropdowns(sourceLabel = '') {
+      const datalist = document.getElementById('employeeDatalist');
+      const select = document.getElementById('employeeQuickSelect');
+      datalist.innerHTML = '';
+      select.innerHTML = `<option value="">-- Pilih (${employeeMasterList.length}) --</option>`;
+
+      employeeMasterList.forEach((emp, idx) => {
+        const optDatalist = document.createElement('option');
+        optDatalist.value = emp.nama;
+        optDatalist.label = `${emp.jabatan} (${emp.nik})`;
+        datalist.appendChild(optDatalist);
+
+        const optSelect = document.createElement('option');
+        optSelect.value = String(idx);
+        optSelect.textContent = emp.nama;
+        select.appendChild(optSelect);
+      });
+
+      if (sourceLabel) {
+        document.getElementById('masterDataStatus').innerHTML = `
+          <span class="text-emerald-700 font-medium">✓ ${employeeMasterList.length} karyawan dimuat (${sourceLabel}).</span>
+        `;
+      }
+    }
+
+    function applyEmployeeRecord(emp, silent = false) {
+      if (!emp) return;
+      document.getElementById('empName').value = emp.nama;
+      document.getElementById('employeeSearchInput').value = emp.nama;
+      document.getElementById('empTitle').value = emp.jabatan;
+      document.getElementById('empId').value = emp.nik;
+      document.getElementById('empNpwp').value = emp.npwp || '';
+      document.getElementById('empBankName').value = emp.bank || '';
+      document.getElementById('empBankAccount').value = emp.no_rekening || '';
+      document.getElementById('empJoinDate').value = emp.join_date || '';
+
+      const ptkpSelect = document.getElementById('empPtkp');
+      const validPtkp = Array.from(ptkpSelect.options).some((o) => o.value === emp.status_ptkp);
+      ptkpSelect.value = validPtkp ? emp.status_ptkp : 'K/3';
+
+      document.getElementById('baseSalary').value = emp.gaji_dasar;
+      document.getElementById('posAllowance').value = emp.tj_posisi;
+      document.getElementById('housingAllowance').value = emp.tj_rumah;
+      document.getElementById('transAllowance').value = emp.tj_transport;
+      document.getElementById('attAllowance').value = emp.tj_kehadiran;
+      document.getElementById('bpjsBenefit').value = emp.bpjs_kes;
+
+      document.getElementById('totalDays').value = emp.total_hari_kerja;
+      document.getElementById('presentDays').value = emp.hari_hadir;
+      document.getElementById('leaveDays').value = emp.cuti_sakit;
+      document.getElementById('absentDays').value = emp.mangkir;
+      document.getElementById('plDays').value = emp.pl_weekend;
+
+      updatePayslip();
+      if (!silent) {
+        showToast(`Data karyawan "${emp.nama}" otomatis diisi.`);
+      }
+    }
+
+    function onEmployeeSearchInput(query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return;
+      const exactMatch = employeeMasterList.find((e) => e.nama.toLowerCase() === q);
+      if (exactMatch) {
+        const idx = employeeMasterList.indexOf(exactMatch);
+        document.getElementById('employeeQuickSelect').value = String(idx);
+        applyEmployeeRecord(exactMatch);
+      }
+    }
+
+    function onDirectNameInput(val) {
+      const q = String(val || '').trim().toLowerCase();
+      const exactMatch = employeeMasterList.find((e) => e.nama.toLowerCase() === q);
+      if (exactMatch) {
+        document.getElementById('employeeSearchInput').value = exactMatch.nama;
+        applyEmployeeRecord(exactMatch);
+      } else {
+        updatePayslip();
+      }
+    }
+
+    function selectEmployeeByIndex(idxStr) {
+      if (idxStr === '') return;
+      const idx = parseInt(idxStr, 10);
+      if (!isNaN(idx) && employeeMasterList[idx]) {
+        applyEmployeeRecord(employeeMasterList[idx]);
+      }
+    }
+
+    function parseWorkbookBuffer(arrayBuffer, sourceLabel, autoSelectFirst = true) {
+      if (typeof XLSX === 'undefined') {
+        showToast('Library pembaca Excel/CSV belum termuat. Periksa koneksi internet.');
+        return;
+      }
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+      const mapped = rows.map(mapRawRowToEmployee).filter(Boolean);
+
+      if (mapped.length === 0) {
+        showToast('File tidak memiliki kolom "nama" atau baris data karyawan yang valid.');
+        return;
+      }
+
+      employeeMasterList = mapped;
+      refreshEmployeeDropdowns(sourceLabel);
+      if (autoSelectFirst) {
+        document.getElementById('employeeQuickSelect').value = '0';
+        applyEmployeeRecord(employeeMasterList[0], true);
+      }
+      showToast(`Berhasil memuat ${mapped.length} data karyawan dari ${sourceLabel}.`);
+    }
+
+    function handleEmployeeFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          parseWorkbookBuffer(e.target.result, file.name, true);
+        } catch (err) {
+          showToast('Gagal membaca file CSV/Excel. Pastikan format file sesuai template.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function downloadEmployeeTemplate() {
+      const headers = [
+        'nama', 'jabatan', 'nik', 'npwp', 'bank', 'no_rekening',
+        'status_ptkp', 'join_date', 'gaji_dasar', 'tj_posisi',
+        'tj_rumah', 'tj_transport', 'tj_kehadiran', 'bpjs_kes',
+        'total_hari_kerja', 'hari_hadir', 'cuti_sakit', 'mangkir', 'pl_weekend'
+      ];
+      const sampleRow1 = [
+        'Yohan Kurniawan', 'Senior Operation and People Manager', 'AEER-2026-1106',
+        '00.000.000.0-000.000', 'BCA', '1234567890', 'K/3', '6 November 2026',
+        23850000, 5000000, 0, 1500000, 1500000, 150000, 23, 14, 0, 0, 0
+      ];
+      const sampleRow2 = [
+        'Siti Rahmawati', 'Research & Policy Analyst', 'AEER-2025-0412',
+        '11.222.333.4-555.000', 'Mandiri', '1270009876543', 'TK/0', '1 April 2025',
+        12000000, 2000000, 0, 1000000, 1000000, 150000, 23, 22, 1, 0, 1
+      ];
+
+      const escapeCsv = (v) => {
+        const s = String(v ?? '');
+        return s.includes(',') || s.includes('"') ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+
+      const csvContent = [
+        headers.join(','),
+        sampleRow1.map(escapeCsv).join(','),
+        sampleRow2.map(escapeCsv).join(',')
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'template-karyawan-aeer.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('File template-karyawan-aeer.csv berhasil diunduh!');
+    }
+
+    async function tryLoadRepoEmployeeCsv() {
+      try {
+        const res = await fetch('./data-karyawan.csv', { cache: 'no-store' });
+        if (!res.ok) return;
+        const buf = await res.arrayBuffer();
+        parseWorkbookBuffer(buf, 'data-karyawan.csv (repo)', false);
+      } catch (_) {
+        // Diabaikan secara halus bila file ./data-karyawan.csv tidak ada di repo
+      }
+    }
+
     // Download index.html
     function downloadSourceHTML() {
       const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
@@ -1133,7 +1445,9 @@
 
     // Inisialisasi saat halaman dimuat
     window.addEventListener('DOMContentLoaded', () => {
+      refreshEmployeeDropdowns();
       onTaxModeChange();
+      tryLoadRepoEmployeeCsv();
     });
   </script>
 </body>
