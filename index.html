@@ -6,7 +6,7 @@
   <title>AEER Payslip Generator — Aksi Ekologi dan Emansipasi Rakyat</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Merriweather (untuk kop resmi) -->
+  <!-- Google Fonts: Inter & Merriweather -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet" />
@@ -22,19 +22,18 @@
       font-family: 'Merriweather', Georgia, serif;
     }
 
-    /* Styling Khusus Lembar A4 */
+    /* Lembar Kerja A4 */
     .a4-sheet {
       width: 210mm;
       min-height: 297mm;
       background: #ffffff;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-      padding: 14mm 16mm;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+      padding: 13mm 15mm;
       margin: 0 auto;
       position: relative;
       box-sizing: border-box;
     }
 
-    /* Responsif skala preview pada layar kecil */
     @media screen and (max-width: 1280px) {
       .preview-wrapper {
         overflow-x: auto;
@@ -73,7 +72,7 @@
         min-height: 297mm !important;
         box-shadow: none !important;
         margin: 0 !important;
-        padding: 13mm 15mm !important;
+        padding: 12mm 14mm !important;
         page-break-after: avoid;
       }
     }
@@ -81,7 +80,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- TOP NAVBAR (Disembunyikan saat Print) -->
+  <!-- TOP ACTION BAR -->
   <header class="no-print bg-[#0f2942] text-white shadow-md sticky top-0 z-30">
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -92,13 +91,16 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-bold tracking-tight">AEER Payslip Generator</h1>
-          <p class="text-xs text-slate-300">Sistem Slip Gaji Kehadiran, Prorata, Benefit BPJS &amp; Hak PL/LP</p>
+          <p class="text-xs text-slate-300">Payroll Prorata, Benefit BPJS Mandiri, Hak PL &amp; Rekonsiliasi PPh 21 (PMK 168/2023)</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <button type="button" onclick="resetDefaults()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-700/70 hover:bg-slate-600 text-slate-100 transition cursor-pointer">
-          Reset Default
+        <button type="button" onclick="applyDecemberPreset()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-amber-600/90 hover:bg-amber-500 text-white transition cursor-pointer" title="Simulasi Gaji Desember 2026 + Pengembalian Lebih Potong PPh 21 November">
+          Simulasi Des (Refund Pajak)
+        </button>
+        <button type="button" onclick="resetDefaults()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-slate-700/80 hover:bg-slate-600 text-slate-100 transition cursor-pointer">
+          Reset Default (Nov)
         </button>
         <button type="button" onclick="downloadSourceHTML()" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white transition flex items-center gap-1.5 shadow-sm cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -110,36 +112,36 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
           </svg>
-          Print / Save as PDF
+          Print / Save PDF
         </button>
       </div>
     </div>
   </header>
 
-  <!-- NOTIFICATION BANNER (Pengganti alert) -->
+  <!-- TOAST NOTIFICATION -->
   <div id="toastBanner" class="no-print hidden fixed bottom-5 right-5 z-50 bg-[#0f2942] text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-lg border border-sky-500/40 flex items-center gap-2.5">
     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-    <span id="toastMessage">File berhasil diunduh.</span>
+    <span id="toastMessage">Aksi berhasil dijalankan.</span>
   </div>
 
   <!-- MAIN WORKSPACE -->
   <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
 
-    <!-- PANEL KIRI: EDITOR / INPUT DATA (Disembunyikan saat Print) -->
+    <!-- PANEL KIRI: CONTROL PANEL -->
     <section class="no-print xl:col-span-5 space-y-5 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
       <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
         <div>
-          <h2 class="text-base font-bold text-[#0f2942]">Input Data Payslip</h2>
-          <p class="text-xs text-slate-500">Perubahan langsung memperbarui pratinjau A4 di kanan</p>
+          <h2 class="text-base font-bold text-[#0f2942]">Pengaturan &amp; Input Payroll</h2>
+          <p class="text-xs text-slate-500">Semua perubahan langsung diperbarui pada slip gaji A4</p>
         </div>
         <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-[#0284c7] border border-sky-200">Live Sync</span>
       </div>
 
-      <!-- Logo Kustom Opsional -->
+      <!-- Logo Kop Surat -->
       <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between gap-2">
         <div>
           <label class="block text-xs font-semibold text-slate-700">Logo Kop Surat AEER</label>
-          <p class="text-[11px] text-slate-500">Default memuat <code class="text-slate-700">./logo-aeer.jpg</code> atau upload manual</p>
+          <p class="text-[11px] text-slate-500">Otomatis memuat <code class="text-slate-700">./logo-aeer.jpg</code> atau unggah file lokal</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <label class="px-3 py-1.5 text-xs font-medium bg-white border border-slate-300 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-700">
@@ -152,9 +154,9 @@
         </div>
       </div>
 
-      <!-- 1. Identitas Karyawan & Penyetuju -->
+      <!-- 1. Identitas Karyawan & Periode -->
       <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan &amp; Koordinator</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">1. Identitas Karyawan &amp; Periode</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Nama Karyawan</label>
@@ -166,11 +168,31 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">NIK / ID Karyawan</label>
-            <input type="text" id="empId" value="AEER-2026-011" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <input type="text" id="empId" value="AEER-2026-1106" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">NPWP</label>
+            <input type="text" id="empNpwp" placeholder="00.000.000.0-000.000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Rekening Bank</label>
+            <input type="text" id="empBank" value="BCA - Yohan Kurniawan" placeholder="Nama Bank - No. Rekening / Atas Nama" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Join Date</label>
+            <input type="text" id="empJoinDate" value="6 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Periode Cut-Off</label>
+            <input type="text" id="payPeriod" value="26 Oktober – 25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Pembayaran (Payment Date)</label>
+            <input type="text" id="payDate" value="25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Status Pajak (PTKP)</label>
-            <select id="empPtkp" onchange="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none">
+            <select id="empPtkp" onchange="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0284c7] outline-none">
               <option value="TK/0">TK/0 (TER Kategori A)</option>
               <option value="TK/1">TK/1 (TER Kategori A)</option>
               <option value="K/0">K/0 (TER Kategori A)</option>
@@ -179,145 +201,147 @@
               <option value="K/1">K/1 (TER Kategori B)</option>
               <option value="K/2">K/2 (TER Kategori B)</option>
               <option value="K/3" selected>K/3 (TER Kategori B)</option>
+              <option value="K/I/0">K/I/0 (TER Kategori C)</option>
+              <option value="K/I/1">K/I/1 (TER Kategori C)</option>
+              <option value="K/I/2">K/I/2 (TER Kategori C)</option>
+              <option value="K/I/3">K/I/3 (TER Kategori C)</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Join Date</label>
-            <input type="text" id="empJoinDate" value="6 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Periode Cut-off</label>
-            <input type="text" id="payPeriod" value="26 Oktober – 25 November 2026" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Rekening Bank</label>
-            <input type="text" id="empBank" value="BCA - a.n. Yohan Kurniawan" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Nama Koordinator (Penyetuju)</label>
-            <input type="text" id="approverName" value="Pius Ginting" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Masa Kerja Tahun Berjalan (Bulan)</label>
+            <input type="number" id="monthsWorkedYear" value="2" min="1" max="12" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#0284c7] outline-none font-semibold" />
           </div>
         </div>
       </div>
 
-      <!-- 2. Input Kehadiran, Cuti/Sakit, Mangkir & PL/LP -->
+      <!-- 2. Kehadiran, Cuti/Sakit, Mangkir & PL -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">2. Data Kehadiran &amp; Hari Kerja</h3>
-          <span class="text-[11px] font-medium text-slate-500">Dasar Prorata &amp; Potongan Absensi</span>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">2. Kehadiran &amp; Hari Kerja</h3>
+          <span class="text-[11px] font-medium text-slate-500">Dasar Hitung Prorata</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-sky-50/70 p-3.5 rounded-xl border border-sky-200">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Total Hari Kerja Periode</label>
-            <input type="number" id="totalDays" value="23" min="1" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Total Hari Kerja</label>
+            <input type="number" id="totalDays" value="23" min="1" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Hari Hadir</label>
-            <input type="number" id="presentDays" value="14" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-emerald-700" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Hadir</label>
+            <input type="number" id="presentDays" value="14" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-emerald-700" />
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Cuti / Sakit</label>
-            <input type="number" id="leaveDays" value="0" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-700" />
+            <input type="number" id="leaveDays" value="0" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-700" />
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah Mangkir</label>
-            <input type="number" id="absentDays" value="0" min="0" max="31" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-rose-700" />
+            <input type="number" id="absentDays" value="0" min="0" max="31" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-rose-700" />
           </div>
           <div class="col-span-2">
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah PL / LP (Pengganti Libur - Weekend)</label>
-            <input type="number" id="plDays" value="0" min="0" max="15" oninput="onFormulaInputChange()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-[#0284c7]" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jumlah PL (Pengganti Libur - Weekend)</label>
+            <input type="number" id="plDays" value="0" min="0" max="15" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-[#0284c7]" />
           </div>
         </div>
 
-        <!-- Ringkasan Kaidah Hitung Real-Time -->
-        <div class="text-[11px] text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1 leading-relaxed" id="attendanceFormulaSummary">
-          <div>• <strong>Komponen Tetap</strong> (Gaji Dasar, Tj. Posisi, Tj. Rumah): dibayar untuk <strong class="text-slate-900">14 hari</strong> (Hadir + Cuti/Sakit − Mangkir) dari 23 hari kerja.</div>
-          <div>• <strong>Tunjangan Harian</strong> (Tj. Transport &amp; Tj. Kehadiran): dibayar untuk <strong class="text-slate-900">14 hari</strong> (Hadir − Mangkir; hari Cuti/Sakit tidak mendapat tunjangan ini).</div>
-        </div>
+        <div class="text-[11px] text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1 leading-relaxed" id="attendanceRuleInfo"></div>
       </div>
 
-      <!-- 3. Komponen Gaji & Benefit (Rate Bulanan Penuh) -->
+      <!-- 3. Gaji Dasar, Tunjangan & Benefit -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">3. Gaji &amp; Benefit Bulanan (Full Rate - Rp)</h3>
-        </div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">3. Gaji &amp; Benefit Bulanan (Full Rate - Rp)</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Gaji Dasar / Base Salary</label>
-            <input type="number" id="baseSalary" value="23850000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Gaji Dasar (Base Salary)</label>
+            <input type="number" id="baseSalary" value="23850000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Posisi / Positional</label>
-            <input type="number" id="posAllowance" value="5000000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Posisi (Positional)</label>
+            <input type="number" id="posAllowance" value="5000000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Rumah / Housing</label>
-            <input type="number" id="housingAllowance" value="0" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Rumah (Housing)</label>
+            <input type="number" id="housingAllowance" value="0" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Transport / Transport</label>
-            <input type="number" id="transAllowance" value="1500000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Transport</label>
+            <input type="number" id="transAllowance" value="1500000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Kehadiran / Attendance</label>
-            <input type="number" id="attAllowance" value="1500000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+            <label class="block text-xs font-medium text-slate-700 mb-1">Tunjangan Kehadiran</label>
+            <input type="number" id="attAllowance" value="1500000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-medium text-emerald-800">Tunjangan BPJS Kes (Benefit)</label>
-              <label class="inline-flex items-center gap-1 text-[11px] text-slate-600 cursor-pointer">
-                <input type="checkbox" id="prorataBpjsBenefit" onchange="onFormulaInputChange()" class="accent-[#0284c7]" />
-                Prorata
-              </label>
-            </div>
-            <input type="number" id="bpjsBenefit" value="150000" step="1000" oninput="onFormulaInputChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-emerald-300 bg-emerald-50/40 font-medium" />
+            <label class="block text-xs font-medium text-emerald-800 mb-1">Tunjangan BPJS Kesehatan (Benefit Full)</label>
+            <input type="number" id="bpjsBenefit" value="150000" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-emerald-300 bg-emerald-50/40 font-semibold text-emerald-950" />
           </div>
         </div>
       </div>
 
-      <!-- 4. Deductions & PPh 21 -->
+      <!-- 4. Mesin Perhitungan Pajak PPh 21 (PMK 168/2023) -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">4. Deductions (PPh 21 &amp; Potongan Lain)</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-medium text-slate-700">PPh 21 (TER Kategori B / Manual)</label>
-              <label class="inline-flex items-center gap-1 text-[11px] text-slate-600 cursor-pointer">
-                <input type="checkbox" id="autoTax" checked onchange="onFormulaInputChange()" class="accent-[#0284c7]" />
-                Auto TER
-              </label>
-            </div>
-            <input type="number" id="regularTax" value="1269404" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 font-semibold text-slate-800" />
-          </div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0284c7]">4. Perhitungan Pajak PPh 21 (PMK 168/2023)</h3>
 
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">Metode Perhitungan PPh 21</label>
+          <select id="taxMode" onchange="onTaxModeChange()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-medium text-slate-800 focus:ring-2 focus:ring-[#0284c7] outline-none">
+            <option value="TER" selected>1. TER Bulanan (PMK 168/2023) — Masa Pajak Berjalan (Nov 2026)</option>
+            <option value="RECON">2. Rekonsiliasi Akhir Tahun / Masa Pajak Terakhir (2 Bulan Kerja — Des 2026)</option>
+            <option value="MANUAL">3. Manual / Custom Tax Amount</option>
+          </select>
+        </div>
+
+        <!-- Panel Rekonsiliasi Akhir Tahun (2 Bulan Kerja) -->
+        <div id="reconFieldsPanel" class="hidden space-y-2.5 bg-amber-50/80 border border-amber-200 p-3.5 rounded-xl">
+          <div class="text-xs font-semibold text-amber-950">Parameter Rekonsiliasi Masa Pajak Terakhir (Pasal 15 &amp; 21 PMK 168/2023)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-700 mb-1">Akumulasi Bruto Bulan Sebelumnya (Nov 2026)</label>
+              <input type="number" id="priorGrossAccum" value="19536957" step="1000" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-700 mb-1">PPh 21 Sudah Dipotong Sebelumnya (Nov 2026)</label>
+              <input type="number" id="priorTaxWithheld" value="1363478" step="1" oninput="updatePayslip()" class="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-300 bg-white font-semibold text-amber-900" />
+            </div>
+          </div>
+          <p class="text-[11px] text-amber-900 leading-relaxed" id="reconPreviewSummary"></p>
+        </div>
+
+        <!-- Panel Manual Tax -->
+        <div id="manualTaxPanel" class="hidden bg-slate-50 border border-slate-200 p-3 rounded-xl">
+          <label class="block text-xs font-medium text-slate-700 mb-1">Nominal PPh 21 Manual (Rp) <span class="text-[11px] text-slate-500">(gunakan tanda minus "-" jika pengembalian lebih potong)</span></label>
+          <input type="number" id="manualTaxAmount" value="0" step="1" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white font-semibold" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-slate-700 mb-1">Potongan Lainnya (Rp)</label>
             <input type="number" id="otherDeduction" value="0" step="1000" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
           </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Koordinator AEER (Penyetuju)</label>
+            <input type="text" id="approverName" value="Pius Ginting" oninput="updatePayslip()" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300" />
+          </div>
         </div>
-        <p class="text-[11px] text-slate-500 leading-relaxed">
-          *BPJS Kesehatan dimasukkan sebagai <strong>Benefit (Earnings)</strong> karena kepesertaan mandiri oleh karyawan, sehingga tidak mengurangi THP. PPh 21 dihitung otomatis menggunakan tarif efektif bulanan (PMK 168/2023) atau dapat diinput manual dengan menghapus centang <em>Auto TER</em>.
-        </p>
       </div>
     </section>
 
-    <!-- PANEL KANAN: LIVE PREVIEW LEMBAR A4 PAYSLIP -->
+    <!-- PANEL KANAN: LIVE PREVIEW A4 PAYSLIP -->
     <section class="print-container xl:col-span-7 preview-wrapper flex flex-col items-center">
       <div class="no-print w-full max-w-[210mm] mb-2.5 flex items-center justify-between text-xs text-slate-500 px-1">
         <span>Pratinjau Dokumen Resmi (Ukuran Kertas A4)</span>
-        <span>Tip: Klik <strong>Print / Save as PDF</strong> lalu pilih <em>Save as PDF</em></span>
+        <span>Gunakan tombol <strong>Print / Save PDF</strong> untuk menyimpan slip gaji</span>
       </div>
 
-      <!-- KERTAS A4 -->
+      <!-- DOKUMEN A4 -->
       <article class="a4-sheet text-slate-800 flex flex-col justify-between" id="payslipDocument">
         <div>
-          <!-- 1. KOP SURAT / HEADER RESMI AEER -->
+          <!-- 1. KOP SURAT RESMI AEER -->
           <header class="flex items-start gap-4 pb-3 border-b-[2.5px] border-[#0f2942]">
-            <div id="logoContainer" class="w-[78px] h-[78px] shrink-0 rounded-sm overflow-hidden bg-black flex items-center justify-center border border-slate-300">
+            <div id="logoContainer" class="w-[76px] h-[76px] shrink-0 rounded-sm overflow-hidden bg-black flex items-center justify-center border border-slate-300">
               <img
                 src="./logo-aeer.jpg"
-                alt="AEER Logo"
+                alt="Logo AEER"
                 class="w-full h-full object-cover"
                 onerror="this.onerror=null; this.parentElement.innerHTML=defaultLogoHTML;"
               />
@@ -331,10 +355,10 @@
                 Talavera Office Park 28 floor Jl. T.B. Simatupang, Kav 22-26 Jakarta 12430 Indonesia
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Telephone : 021-75999928 Faximile 021-75999888
+                Telephone : 021-75999928 | Faximile 021-75999888
               </p>
               <p class="text-[10.5px] text-slate-600">
-                Email : info@aeer.or.id http://aeer.or.id
+                Email : info@aeer.or.id | http://aeer.or.id
               </p>
               <p class="text-[10.5px] text-slate-600">
                 Legality : Decision of Ministry Law and Human Rights of Republic of Indonesia Number : AHU-0008978.AH.01.07.Tahun 2017
@@ -342,14 +366,14 @@
             </div>
           </header>
 
-          <!-- JUDUL DOKUMEN -->
-          <div class="mt-3.5 mb-3.5 flex items-center justify-between bg-[#0f2942] text-white px-4 py-2 rounded-md">
+          <!-- BANNER JUDUL -->
+          <div class="mt-3 mb-3 flex items-center justify-between bg-[#0f2942] text-white px-4 py-2 rounded-md">
             <h2 class="text-xs font-bold uppercase tracking-[0.12em]">SLIP GAJI KARYAWAN / EMPLOYEE PAYSLIP</h2>
             <span class="text-[10.5px] font-medium text-sky-200" id="docPeriodBadge">Periode: 26 Oktober – 25 November 2026</span>
           </div>
 
           <!-- 2. IDENTITAS KARYAWAN & PERIODE -->
-          <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] bg-slate-50 border border-slate-200 rounded-lg p-3 mb-3">
+          <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[10.5px] bg-slate-50 border border-slate-200 rounded-lg p-3 mb-2.5">
             <div class="space-y-1">
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">Nama Karyawan</span>
@@ -364,12 +388,17 @@
               <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">NIK / ID</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewEmpId">AEER-2026-011</span>
+                <span class="text-slate-800" id="viewEmpId">AEER-2026-1106</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Status PTKP</span>
+                <span class="w-28 text-slate-500 shrink-0">NPWP</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="font-semibold text-slate-800" id="viewEmpPtkp">K/3</span>
+                <span class="text-slate-800" id="viewEmpNpwp">-</span>
+              </div>
+              <div class="flex">
+                <span class="w-28 text-slate-500 shrink-0">Rekening Bank</span>
+                <span class="mr-2 text-slate-500">:</span>
+                <span class="text-slate-800" id="viewEmpBank">BCA - Yohan Kurniawan</span>
               </div>
             </div>
 
@@ -380,50 +409,55 @@
                 <span class="font-semibold text-slate-800" id="viewPayPeriod">26 Oktober – 25 November 2026</span>
               </div>
               <div class="flex">
+                <span class="w-28 text-slate-500 shrink-0">Tanggal Bayar</span>
+                <span class="mr-2 text-slate-500">:</span>
+                <span class="text-slate-800" id="viewPayDate">25 November 2026</span>
+              </div>
+              <div class="flex">
                 <span class="w-28 text-slate-500 shrink-0">Join Date</span>
                 <span class="mr-2 text-slate-500">:</span>
                 <span class="text-slate-800" id="viewJoinDate">6 November 2026</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Rekening Bank</span>
+                <span class="w-28 text-slate-500 shrink-0">Status PTKP</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewEmpBank">BCA - a.n. Yohan Kurniawan</span>
+                <span class="font-semibold text-slate-800" id="viewEmpPtkp">K/3 (TER Kategori B)</span>
               </div>
               <div class="flex">
-                <span class="w-28 text-slate-500 shrink-0">Rasio Hari Bayar</span>
+                <span class="w-28 text-slate-500 shrink-0">Masa Kerja 2026</span>
                 <span class="mr-2 text-slate-500">:</span>
-                <span class="text-slate-800" id="viewRatioInfo">14 / 23 Hari Kerja (60,87%)</span>
+                <span class="text-slate-800" id="viewMonthsWorked">2 Bulan (Nov – Des 2026)</span>
               </div>
             </div>
           </div>
 
-          <!-- 3. RINGKASAN KEHADIRAN & CUTI (ATTENDANCE STRIP) -->
-          <div class="grid grid-cols-5 border border-slate-300 rounded-lg overflow-hidden mb-3.5 text-center text-[10.5px]">
+          <!-- 3. STRIP KEHADIRAN -->
+          <div class="grid grid-cols-5 border border-slate-300 rounded-lg overflow-hidden mb-3 text-center text-[10px]">
             <div class="py-1.5 px-2 bg-slate-100 border-r border-slate-300">
               <div class="text-slate-500 font-medium">Hari Kerja</div>
               <div class="font-bold text-slate-900 text-xs mt-0.5" id="stripTotalDays">23 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-emerald-50/60 border-r border-slate-300">
+            <div class="py-1.5 px-2 bg-emerald-50/70 border-r border-slate-300">
               <div class="text-emerald-700 font-medium">Hadir</div>
               <div class="font-bold text-emerald-900 text-xs mt-0.5" id="stripPresentDays">14 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-amber-50/60 border-r border-slate-300">
+            <div class="py-1.5 px-2 bg-amber-50/70 border-r border-slate-300">
               <div class="text-amber-700 font-medium">Cuti / Sakit</div>
               <div class="font-bold text-amber-900 text-xs mt-0.5" id="stripLeaveDays">0 Hari</div>
             </div>
-            <div class="py-1.5 px-2 bg-rose-50/60 border-r border-slate-300">
+            <div class="py-1.5 px-2 bg-rose-50/70 border-r border-slate-300">
               <div class="text-rose-700 font-medium">Mangkir</div>
               <div class="font-bold text-rose-900 text-xs mt-0.5" id="stripAbsentDays">0 Hari</div>
             </div>
             <div class="py-1.5 px-2 bg-sky-50/80">
-              <div class="text-[#0284c7] font-medium">Hak PL / LP</div>
+              <div class="text-[#0284c7] font-medium">Hak PL (Weekend)</div>
               <div class="font-bold text-[#0f2942] text-xs mt-0.5" id="stripPlDays">0 Hari</div>
             </div>
           </div>
 
-          <!-- 4. TABEL DUA KOLOM: EARNINGS VS DEDUCTIONS -->
-          <div class="border border-slate-300 rounded-lg overflow-hidden mb-3.5">
-            <table class="w-full text-[11px] border-collapse">
+          <!-- 4. TABEL EARNINGS & BENEFITS VS DEDUCTIONS -->
+          <div class="border border-slate-300 rounded-lg overflow-hidden mb-3">
+            <table class="w-full text-[10.5px] border-collapse">
               <thead>
                 <tr class="bg-[#0f2942] text-white">
                   <th class="text-left py-2 px-3 font-semibold w-[34%] border-r border-slate-600">EARNINGS &amp; BENEFITS</th>
@@ -433,144 +467,153 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
-                <!-- Baris 1 -->
+                <!-- Row 1 -->
                 <tr>
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Gaji Dasar (Base Salary)</div>
-                    <div class="text-[9.5px] text-slate-500" id="subBase">Full: Rp 23.850.000 (14/23 hr)</div>
+                    <div class="text-[9px] text-slate-500" id="subBase">Full: Rp 23.850.000 (14/23 hr)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valBase">Rp 14.517.391</td>
-                  <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-medium text-slate-800">PPh Pasal 21 (Regular Tax)</div>
-                    <div class="text-[9.5px] text-slate-500" id="subTax">Status K/3 (TER Kategori B)</div>
+                  <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valBase">Rp 14.517.391</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200">
+                    <div class="font-medium text-slate-800" id="lblTaxDed">PPh Pasal 21 (TER Kategori B)</div>
+                    <div class="text-[9px] text-slate-500" id="subTaxDed">Tarif Efektif 7,00% × Bruto</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valTax">Rp 1.269.404</td>
+                  <td class="py-1.5 px-3 text-right font-medium tabular-nums" id="valTaxDed">Rp 1.367.587</td>
                 </tr>
 
-                <!-- Baris 2 -->
+                <!-- Row 2 -->
                 <tr class="bg-slate-50/60">
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Posisi (Positional)</div>
-                    <div class="text-[9.5px] text-slate-500" id="subPos">Full: Rp 5.000.000 (14/23 hr)</div>
+                    <div class="text-[9px] text-slate-500" id="subPos">Full: Rp 5.000.000 (14/23 hr)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valPos">Rp 3.043.478</td>
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valPos">Rp 3.043.478</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Potongan Lainnya</div>
-                    <div class="text-[9.5px] text-slate-500">Koreksi / Pinjaman / Lain-lain</div>
+                    <div class="text-[9px] text-slate-500">Koreksi / Pinjaman / Lain-lain</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium tabular-nums" id="valOtherDed">Rp 0</td>
+                  <td class="py-1.5 px-3 text-right font-medium tabular-nums" id="valOtherDed">Rp 0</td>
                 </tr>
 
-                <!-- Baris 3 -->
+                <!-- Row 3 -->
                 <tr>
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Rumah (Housing)</div>
-                    <div class="text-[9.5px] text-slate-500" id="subHousing">Full: Rp 0 (14/23 hr)</div>
+                    <div class="text-[9px] text-slate-500" id="subHousing">Full: Rp 0 (14/23 hr)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valHousing">Rp 0</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400 italic text-[10px]">
+                  <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valHousing">Rp 0</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200 text-slate-400 italic text-[9.5px]">
                     BPJS Kesehatan (Kepesertaan Mandiri)
                   </td>
-                  <td class="py-2 px-3 text-right text-slate-400 text-[10px]">Non-Deduction</td>
+                  <td class="py-1.5 px-3 text-right text-slate-400 text-[9.5px]">Non-Deduction</td>
                 </tr>
 
-                <!-- Baris 4 -->
+                <!-- Row 4 -->
                 <tr class="bg-slate-50/60">
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Transport</div>
-                    <div class="text-[9.5px] text-slate-500" id="subTrans">Full: Rp 1.500.000 (14/23 hr hadir)</div>
+                    <div class="text-[9px] text-slate-500" id="subTrans">Full: Rp 1.500.000 (14/23 hr hadir)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valTrans">Rp 913.043</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
-                  <td class="py-2 px-3 text-right text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valTrans">Rp 913.043</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200 text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- Baris 5 -->
+                <!-- Row 5 -->
                 <tr>
-                  <td class="py-2 px-3 border-r border-slate-200">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
                     <div class="font-medium text-slate-800">Tunjangan Kehadiran</div>
-                    <div class="text-[9.5px] text-slate-500" id="subAtt">Full: Rp 1.500.000 (14/23 hr hadir)</div>
+                    <div class="text-[9px] text-slate-500" id="subAtt">Full: Rp 1.500.000 (14/23 hr hadir)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valAtt">Rp 913.043</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
-                  <td class="py-2 px-3 text-right text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right font-medium border-r border-slate-300 tabular-nums" id="valAtt">Rp 913.043</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200 text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- Baris 6: BPJS Kesehatan sebagai Benefit -->
-                <tr class="bg-emerald-50/50">
-                  <td class="py-2 px-3 border-r border-slate-200">
-                    <div class="font-semibold text-emerald-900">Tunjangan BPJS Kesehatan (Benefit)</div>
-                    <div class="text-[9.5px] text-emerald-700" id="subBpjsBen">Benefit Kepesertaan Mandiri (Full)</div>
+                <!-- Row 6: BPJS Kesehatan Benefit (Full) -->
+                <tr class="bg-emerald-50/60">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
+                    <div class="font-semibold text-emerald-950">Tunjangan BPJS Kesehatan (Benefit)</div>
+                    <div class="text-[9px] text-emerald-700">Benefit Kepesertaan Mandiri (Dibayar Full)</div>
                   </td>
-                  <td class="py-2 px-3 text-right font-semibold text-emerald-900 border-r border-slate-300 tabular-nums" id="valBpjsBen">Rp 150.000</td>
-                  <td class="py-2 px-3 border-r border-slate-200 text-slate-400">-</td>
-                  <td class="py-2 px-3 text-right text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right font-semibold text-emerald-950 border-r border-slate-300 tabular-nums" id="valBpjsBen">Rp 150.000</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200 text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right text-slate-400">-</td>
                 </tr>
 
-                <!-- BARIS TOTAL GROSS -->
+                <!-- Row 7: Pengembalian Lebih Potong PPh 21 (Muncul saat Rekonsiliasi / Refund > 0) -->
+                <tr id="taxRefundRow" class="hidden bg-amber-50/80">
+                  <td class="py-1.5 px-3 border-r border-slate-200">
+                    <div class="font-semibold text-amber-950">Pengembalian Lebih Potong PPh 21</div>
+                    <div class="text-[9px] text-amber-800" id="subTaxRefund">Koreksi Masa Pajak Terakhir (2 Bulan Kerja)</div>
+                  </td>
+                  <td class="py-1.5 px-3 text-right font-semibold text-amber-950 border-r border-slate-300 tabular-nums" id="valTaxRefund">Rp 0</td>
+                  <td class="py-1.5 px-3 border-r border-slate-200 text-slate-400">-</td>
+                  <td class="py-1.5 px-3 text-right text-slate-400">-</td>
+                </tr>
+
+                <!-- TOTAL GROSS -->
                 <tr class="bg-slate-100 font-bold text-[#0f2942] border-t-2 border-slate-300">
-                  <td class="py-2.5 px-3 border-r border-slate-200 uppercase">GROSS EARNINGS</td>
-                  <td class="py-2.5 px-3 text-right border-r border-slate-300 tabular-nums" id="valGrossEarnings">Rp 19.536.955</td>
-                  <td class="py-2.5 px-3 border-r border-slate-200 uppercase">TOTAL DEDUCTIONS</td>
-                  <td class="py-2.5 px-3 text-right text-rose-700 tabular-nums" id="valGrossDeductions">Rp 1.269.404</td>
+                  <td class="py-2 px-3 border-r border-slate-200 uppercase">GROSS EARNINGS</td>
+                  <td class="py-2 px-3 text-right border-r border-slate-300 tabular-nums" id="valGrossEarnings">Rp 19.536.955</td>
+                  <td class="py-2 px-3 border-r border-slate-200 uppercase">TOTAL DEDUCTIONS</td>
+                  <td class="py-2 px-3 text-right text-rose-700 tabular-nums" id="valGrossDeductions">Rp 1.367.587</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- 5. KOTAK SUMMARY TOTAL NET PAY (TAKE-HOME PAY) -->
-          <div class="bg-[#0f2942] text-white rounded-lg p-3.5 mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <!-- 5. NET TAKE-HOME PAY BANNER -->
+          <div class="bg-[#0f2942] text-white rounded-lg p-3.5 mb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold">NET TAKE-HOME PAY (THP DITERIMA)</div>
-              <div class="text-[10.5px] text-slate-200 italic mt-0.5" id="valTerbilang">
-                Terbilang: Delapan Belas Juta Dua Ratus Enam Puluh Tujuh Ribu Lima Ratus Lima Puluh Satu Rupiah
+              <div class="text-[10px] text-slate-200 italic mt-0.5" id="valTerbilang">
+                Terbilang: Delapan Belas Juta Seratus Enam Puluh Sembilan Ribu Tiga Ratus Enam Puluh Delapan Rupiah
               </div>
             </div>
             <div class="text-right shrink-0">
-              <div class="text-xl font-bold tracking-tight tabular-nums text-white" id="valNetPay">Rp 18.267.551</div>
+              <div class="text-xl font-bold tracking-tight tabular-nums text-white" id="valNetPay">Rp 18.169.368</div>
             </div>
           </div>
 
-          <!-- 6. KOTAK HAK PENGGANTI LIBUR (PL / LP) -->
-          <div id="plEntitlementBox" class="bg-sky-50 border border-sky-300 rounded-lg px-3.5 py-2.5 mb-3 flex items-start gap-2.5">
-            <div class="w-5 h-5 rounded-full bg-[#0284c7] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+          <!-- 6. KOTAK HAK PENGGANTI LIBUR (PL) — TAMPIL JIKA PL > 0 -->
+          <div id="plEntitlementBox" class="hidden bg-sky-50 border border-sky-300 rounded-lg px-3.5 py-2 mb-2.5 flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-[#0284c7] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
               PL
             </div>
-            <div class="text-[10.5px] text-slate-800 leading-snug">
-              <div class="font-bold text-[#0f2942]">Catatan Hak Pengganti Libur (PL / LP):</div>
-              <p id="plEntitlementText">
-                Karyawan berhak atas <strong>0 hari Pengganti Libur (PL/LP)</strong> pada bulan berjalan atas kehadiran di hari akhir pekan (weekend).
-              </p>
+            <div class="text-[10px] text-slate-800 leading-snug">
+              <span class="font-bold text-[#0f2942]">Hak Pengganti Libur (PL):</span>
+              <span id="plEntitlementText"></span>
             </div>
           </div>
 
-          <!-- 7. KETERANGAN RINCIAN POTONGAN KEHADIRAN -->
-          <div class="text-[9.5px] text-slate-600 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-4 leading-relaxed" id="docFootnote">
-            <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (14/23 hari) serta dipotong proporsional untuk hari mangkir (0 hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir aktual (14/23 hari; hari cuti/sakit &amp; mangkir tidak memperoleh tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan sebagai benefit mandiri.
-          </div>
+          <!-- 7. CATATAN PAJAK (2 BULAN KERJA / REKONSILIASI) & ATURAN KEHADIRAN -->
+          <div id="taxExplanationBox" class="bg-amber-50/70 border border-amber-200 rounded-lg px-3.5 py-2 mb-2.5 text-[9.5px] text-slate-800 leading-relaxed"></div>
+
+          <div class="text-[9px] text-slate-600 bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 mb-3 leading-relaxed" id="docFootnote"></div>
         </div>
 
-        <!-- 8. BLOK TANDA TANGAN DUA KOLOM (KOORDINATOR & KARYAWAN) -->
+        <!-- 8. BLOK TANDA TANGAN RESMI DUA KOLOM -->
         <div class="pt-1">
-          <div class="grid grid-cols-2 gap-12 text-[11px] text-slate-700">
+          <div class="grid grid-cols-2 gap-12 text-[10.5px] text-slate-700">
             <div class="text-center">
-              <p class="text-slate-600 font-medium">Disetujui oleh,</p>
-              <p class="text-[10px] text-slate-500 mb-14">Koordinator AEER</p>
+              <p class="text-slate-600 font-medium">Disetujui / Disahkan oleh,</p>
+              <p class="text-[9.5px] text-slate-500 mb-12">Koordinator AEER</p>
               <div class="w-52 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewApproverName">Pius Ginting</div>
-              <p class="text-[10px] text-slate-500 mt-0.5">Koordinator AEER</p>
+              <p class="text-[9.5px] text-slate-500 mt-0.5">Koordinator AEER</p>
             </div>
 
             <div class="text-center">
               <p class="text-slate-600 font-medium">Diterima oleh,</p>
-              <p class="text-[10px] text-slate-500 mb-14">Karyawan</p>
+              <p class="text-[9.5px] text-slate-500 mb-12">Karyawan</p>
               <div class="w-52 mx-auto border-b border-slate-800 font-bold text-slate-900 pb-0.5" id="viewReceiverName">Yohan Kurniawan</div>
-              <p class="text-[10px] text-slate-500 mt-0.5" id="viewReceiverTitle">Senior Operation and People Manager</p>
+              <p class="text-[9.5px] text-slate-500 mt-0.5" id="viewReceiverTitle">Senior Operation and People Manager</p>
             </div>
           </div>
 
-          <div class="mt-5 pt-2 border-t border-slate-200 flex items-center justify-between text-[9px] text-slate-400">
+          <div class="mt-4 pt-2 border-t border-slate-200 flex items-center justify-between text-[8.5px] text-slate-400">
             <span>Dokumen Rahasia (Confidential) — Aksi Ekologi dan Emansipasi Rakyat (AEER)</span>
-            <span>AEER Payroll System</span>
+            <span>Generated by AEER Payroll System</span>
           </div>
         </div>
       </article>
@@ -578,7 +621,7 @@
   </main>
 
   <script>
-    // SVG Fallback jika ./logo-aeer.jpg tidak ditemukan saat pratinjau lokal
+    // SVG Fallback jika ./logo-aeer.jpg belum tersedia saat dibuka lokal
     const defaultLogoHTML = `
       <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -609,7 +652,7 @@
     `;
     const initialLogoContainerHTML = document.getElementById('logoContainer').innerHTML;
 
-    // Format angka ke Rupiah dengan titik pemisah ribuan
+    // Format Rupiah (IDR)
     function formatIDR(num) {
       const rounded = Math.round(num || 0);
       return 'Rp ' + rounded.toLocaleString('id-ID');
@@ -631,234 +674,363 @@
       return '';
     }
 
-    // Estimasi PPh 21 Bulanan (PMK 168/2023 TER Kategori A & B)
-    function estimatePPh21TER(gross, ptkp) {
-      if (gross <= 0) return 0;
-
-      const catA = ['TK/0', 'TK/1', 'K/0'];
-      const catB = ['TK/2', 'TK/3', 'K/1', 'K/2', 'K/3'];
-      let rate = 0;
-
-      if (catA.includes(ptkp)) {
-        if (gross <= 5400000) rate = 0;
-        else if (gross <= 5650000) rate = 0.0025;
-        else if (gross <= 5950000) rate = 0.005;
-        else if (gross <= 6300000) rate = 0.0075;
-        else if (gross <= 6750000) rate = 0.01;
-        else if (gross <= 7500000) rate = 0.0125;
-        else if (gross <= 8550000) rate = 0.015;
-        else if (gross <= 9650000) rate = 0.0175;
-        else if (gross <= 10050000) rate = 0.02;
-        else if (gross <= 10350000) rate = 0.0225;
-        else if (gross <= 10700000) rate = 0.025;
-        else if (gross <= 11050000) rate = 0.03;
-        else if (gross <= 11600000) rate = 0.035;
-        else if (gross <= 12500000) rate = 0.04;
-        else if (gross <= 13750000) rate = 0.05;
-        else if (gross <= 15100000) rate = 0.06;
-        else if (gross <= 16950000) rate = 0.07;
-        else if (gross <= 19750000) rate = 0.08;
-        else if (gross <= 24150000) rate = 0.09;
-        else if (gross <= 26450000) rate = 0.10;
-        else if (gross <= 28000000) rate = 0.11;
-        else if (gross <= 30050000) rate = 0.12;
-        else if (gross <= 32400000) rate = 0.13;
-        else rate = 0.14;
-      } else if (catB.includes(ptkp)) {
-        if (gross <= 6200000) rate = 0;
-        else if (gross <= 6500000) rate = 0.0025;
-        else if (gross <= 6850000) rate = 0.005;
-        else if (gross <= 7300000) rate = 0.0075;
-        else if (gross <= 9200000) rate = 0.01;
-        else if (gross <= 10750000) rate = 0.015;
-        else if (gross <= 11250000) rate = 0.02;
-        else if (gross <= 11600000) rate = 0.025;
-        else if (gross <= 12600000) rate = 0.03;
-        else if (gross <= 13600000) rate = 0.04;
-        else if (gross <= 14950000) rate = 0.05;
-        else if (gross <= 16400000) rate = 0.06;
-        else if (gross <= 19500000) rate = 0.065;
-        else if (gross <= 22500000) rate = 0.08;
-        else if (gross <= 24600000) rate = 0.09;
-        else if (gross <= 27000000) rate = 0.10;
-        else if (gross <= 29500000) rate = 0.11;
-        else if (gross <= 32000000) rate = 0.12;
-        else if (gross <= 35000000) rate = 0.13;
-        else rate = 0.14;
-      }
-      return Math.round(gross * rate);
+    // Pemetaan PTKP -> Kategori TER & PTKP Tahunan (PMK 168/2023)
+    function getPtkpInfo(ptkp) {
+      const map = {
+        'TK/0': { category: 'A', annualPtkp: 54000000 },
+        'TK/1': { category: 'A', annualPtkp: 58500000 },
+        'K/0':  { category: 'A', annualPtkp: 58500000 },
+        'TK/2': { category: 'B', annualPtkp: 63000000 },
+        'TK/3': { category: 'B', annualPtkp: 67500000 },
+        'K/1':  { category: 'B', annualPtkp: 63000000 },
+        'K/2':  { category: 'B', annualPtkp: 67500000 },
+        'K/3':  { category: 'B', annualPtkp: 72000000 },
+        'K/I/0': { category: 'C', annualPtkp: 112500000 },
+        'K/I/1': { category: 'C', annualPtkp: 117000000 },
+        'K/I/2': { category: 'C', annualPtkp: 121500000 },
+        'K/I/3': { category: 'C', annualPtkp: 126000000 }
+      };
+      return map[ptkp] || { category: 'B', annualPtkp: 72000000 };
     }
 
-    // Hitung komponen pendapatan & trigger auto-pajak jika aktif
-    function calculateComponents() {
+    // Tabel Tarif Efektif Bulanan (TER) Kategori A, B, C (PP 58/2023 & PMK 168/2023)
+    function getTerRate(gross, category) {
+      if (gross <= 0) return 0;
+      if (category === 'A') {
+        if (gross <= 5400000) return 0;
+        if (gross <= 5650000) return 0.0025;
+        if (gross <= 5950000) return 0.005;
+        if (gross <= 6300000) return 0.0075;
+        if (gross <= 6750000) return 0.01;
+        if (gross <= 7500000) return 0.0125;
+        if (gross <= 8550000) return 0.015;
+        if (gross <= 9650000) return 0.0175;
+        if (gross <= 10050000) return 0.02;
+        if (gross <= 10350000) return 0.0225;
+        if (gross <= 10700000) return 0.025;
+        if (gross <= 11050000) return 0.03;
+        if (gross <= 11600000) return 0.035;
+        if (gross <= 12500000) return 0.04;
+        if (gross <= 13750000) return 0.05;
+        if (gross <= 15100000) return 0.06;
+        if (gross <= 16950000) return 0.07;
+        if (gross <= 19750000) return 0.08;
+        if (gross <= 24150000) return 0.09;
+        if (gross <= 26450000) return 0.10;
+        if (gross <= 28000000) return 0.11;
+        if (gross <= 30050000) return 0.12;
+        if (gross <= 32400000) return 0.13;
+        if (gross <= 35400000) return 0.14;
+        return 0.15;
+      } else if (category === 'B') {
+        if (gross <= 6200000) return 0;
+        if (gross <= 6500000) return 0.0025;
+        if (gross <= 6850000) return 0.005;
+        if (gross <= 7300000) return 0.0075;
+        if (gross <= 9200000) return 0.01;
+        if (gross <= 10750000) return 0.015;
+        if (gross <= 11250000) return 0.02;
+        if (gross <= 11600000) return 0.025;
+        if (gross <= 12600000) return 0.03;
+        if (gross <= 13600000) return 0.04;
+        if (gross <= 14950000) return 0.05;
+        if (gross <= 16400000) return 0.06;
+        if (gross <= 19350000) return 0.065;
+        if (gross <= 20200000) return 0.07; // Lapisan Rp 19.350.001 - Rp 20.200.000 = 7%
+        if (gross <= 22500000) return 0.08;
+        if (gross <= 24600000) return 0.09;
+        if (gross <= 27000000) return 0.10;
+        if (gross <= 29500000) return 0.11;
+        if (gross <= 32000000) return 0.12;
+        if (gross <= 35000000) return 0.13;
+        return 0.14;
+      } else {
+        // Kategori C (K/I/0 .. K/I/3)
+        if (gross <= 6600000) return 0;
+        if (gross <= 6950000) return 0.0025;
+        if (gross <= 7350000) return 0.005;
+        if (gross <= 7800000) return 0.0075;
+        if (gross <= 8850000) return 0.01;
+        if (gross <= 9800000) return 0.0125;
+        if (gross <= 10950000) return 0.015;
+        if (gross <= 11200000) return 0.0175;
+        if (gross <= 12050000) return 0.02;
+        if (gross <= 12950000) return 0.03;
+        if (gross <= 14150000) return 0.04;
+        if (gross <= 15550000) return 0.05;
+        if (gross <= 17050000) return 0.06;
+        if (gross <= 19500000) return 0.07;
+        if (gross <= 22700000) return 0.08;
+        if (gross <= 26600000) return 0.09;
+        if (gross <= 28100000) return 0.10;
+        if (gross <= 30100000) return 0.11;
+        if (gross <= 32600000) return 0.12;
+        if (gross <= 35400000) return 0.13;
+        return 0.14;
+      }
+    }
+
+    // Tarif Progresif Pasal 17 UU HPP
+    function calculatePasal17Tax(pkp) {
+      if (pkp <= 0) return 0;
+      const roundedPkp = Math.floor(pkp / 1000) * 1000;
+      let tax = 0;
+      let rem = roundedPkp;
+
+      const tier1 = Math.min(rem, 60000000);
+      tax += tier1 * 0.05;
+      rem -= tier1;
+
+      if (rem > 0) {
+        const tier2 = Math.min(rem, 190000000);
+        tax += tier2 * 0.15;
+        rem -= tier2;
+      }
+      if (rem > 0) {
+        const tier3 = Math.min(rem, 250000000);
+        tax += tier3 * 0.25;
+        rem -= tier3;
+      }
+      if (rem > 0) {
+        const tier4 = Math.min(rem, 4500000000);
+        tax += tier4 * 0.30;
+        rem -= tier4;
+      }
+      if (rem > 0) {
+        tax += rem * 0.35;
+      }
+      return Math.round(tax);
+    }
+
+    // Toggle panel sub-input saat mode pajak berubah
+    function onTaxModeChange() {
+      const mode = document.getElementById('taxMode').value;
+      document.getElementById('reconFieldsPanel').classList.toggle('hidden', mode !== 'RECON');
+      document.getElementById('manualTaxPanel').classList.toggle('hidden', mode !== 'MANUAL');
+      updatePayslip();
+    }
+
+    // Kalkulasi Lengkap & Render Payslip
+    function updatePayslip() {
+      // 1. Data Identitas
+      const empName = document.getElementById('empName').value || '-';
+      const empTitle = document.getElementById('empTitle').value || '-';
+      const empId = document.getElementById('empId').value || '-';
+      const empNpwp = document.getElementById('empNpwp').value || '-';
+      const empBank = document.getElementById('empBank').value || '-';
+      const empJoinDate = document.getElementById('empJoinDate').value || '-';
+      const payPeriod = document.getElementById('payPeriod').value || '-';
+      const payDate = document.getElementById('payDate').value || '-';
+      const empPtkp = document.getElementById('empPtkp').value || 'K/3';
+      const monthsWorkedYear = Math.min(12, Math.max(1, parseInt(document.getElementById('monthsWorkedYear').value, 10) || 2));
+      const approverName = document.getElementById('approverName').value || '-';
+
+      const ptkpMeta = getPtkpInfo(empPtkp);
+
+      // 2. Data Kehadiran & Aturan Prorata
       const totalDays = Math.max(1, parseFloat(document.getElementById('totalDays').value) || 1);
       const presentDays = Math.max(0, parseFloat(document.getElementById('presentDays').value) || 0);
       const leaveDays = Math.max(0, parseFloat(document.getElementById('leaveDays').value) || 0);
       const absentDays = Math.max(0, parseFloat(document.getElementById('absentDays').value) || 0);
       const plDays = Math.max(0, parseFloat(document.getElementById('plDays').value) || 0);
 
-      // Hari bayar komponen tetap (Gaji Dasar, Tj. Posisi, Tj. Rumah):
-      // Hadir + Cuti/Sakit dikurangi Mangkir (dibatasi 0..totalDays)
+      // Gaji Dasar, Tj. Posisi, Tj. Rumah: Hadir + Cuti/Sakit - Mangkir
       const fixedPaidDays = Math.min(totalDays, Math.max(0, (presentDays + leaveDays) - absentDays));
       const fixedRatio = fixedPaidDays / totalDays;
 
-      // Hari bayar tunjangan harian (Tj. Transport & Tj. Kehadiran):
-      // Hadir dikurangi Mangkir (Cuti/Sakit juga memotong tunjangan transport & kehadiran)
+      // Tj. Transport & Tj. Kehadiran: Hadir - Mangkir (Cuti/Sakit juga memotong)
       const dailyPaidDays = Math.min(totalDays, Math.max(0, presentDays - absentDays));
       const dailyRatio = dailyPaidDays / totalDays;
 
-      // Rate penuh bulanan
+      // 3. Komponen Gaji & Benefit
       const fullBase = parseFloat(document.getElementById('baseSalary').value) || 0;
       const fullPos = parseFloat(document.getElementById('posAllowance').value) || 0;
       const fullHousing = parseFloat(document.getElementById('housingAllowance').value) || 0;
       const fullTrans = parseFloat(document.getElementById('transAllowance').value) || 0;
       const fullAtt = parseFloat(document.getElementById('attAllowance').value) || 0;
-      const fullBpjsBen = parseFloat(document.getElementById('bpjsBenefit').value) || 0;
-      const isProrataBpjs = document.getElementById('prorataBpjsBenefit').checked;
+      // BPJS Kesehatan adalah BENEFIT mandiri: dibayar FULL (tidak diprorata)
+      const valBpjsBen = Math.round(parseFloat(document.getElementById('bpjsBenefit').value) || 0);
 
-      // Nilai terhitung
       const valBase = Math.round(fullBase * fixedRatio);
       const valPos = Math.round(fullPos * fixedRatio);
       const valHousing = Math.round(fullHousing * fixedRatio);
       const valTrans = Math.round(fullTrans * dailyRatio);
       const valAtt = Math.round(fullAtt * dailyRatio);
-      const valBpjsBen = isProrataBpjs ? Math.round(fullBpjsBen * fixedRatio) : Math.round(fullBpjsBen);
 
-      const grossEarnings = valBase + valPos + valHousing + valTrans + valAtt + valBpjsBen;
+      // Total Penghasilan Kerja & Benefit Periode Ini (sebelum koreksi pajak)
+      const periodWorkAndBenefitGross = valBase + valPos + valHousing + valTrans + valAtt + valBpjsBen;
 
-      return {
-        totalDays,
-        presentDays,
-        leaveDays,
-        absentDays,
-        plDays,
-        fixedPaidDays,
-        fixedRatio,
-        dailyPaidDays,
-        dailyRatio,
-        fullBase,
-        fullPos,
-        fullHousing,
-        fullTrans,
-        fullAtt,
-        fullBpjsBen,
-        isProrataBpjs,
-        valBase,
-        valPos,
-        valHousing,
-        valTrans,
-        valAtt,
-        valBpjsBen,
-        grossEarnings
-      };
-    }
-
-    function onFormulaInputChange() {
-      const calc = calculateComponents();
-      if (document.getElementById('autoTax').checked) {
-        const ptkp = document.getElementById('empPtkp').value;
-        document.getElementById('regularTax').value = estimatePPh21TER(calc.grossEarnings, ptkp);
-      }
-      updatePayslip();
-    }
-
-    function updatePayslip() {
-      const calc = calculateComponents();
-
-      // Identitas
-      const empName = document.getElementById('empName').value || '-';
-      const empTitle = document.getElementById('empTitle').value || '-';
-      const empId = document.getElementById('empId').value || '-';
-      const empPtkp = document.getElementById('empPtkp').value || 'K/3';
-      const empJoinDate = document.getElementById('empJoinDate').value || '-';
-      const payPeriod = document.getElementById('payPeriod').value || '-';
-      const empBank = document.getElementById('empBank').value || '-';
-      const approverName = document.getElementById('approverName').value || '-';
-
-      // Deductions
-      const valTax = Math.round(parseFloat(document.getElementById('regularTax').value) || 0);
+      // 4. Perhitungan PPh 21 sesuai Mode Pajak
+      const taxMode = document.getElementById('taxMode').value;
       const valOtherDed = Math.round(parseFloat(document.getElementById('otherDeduction').value) || 0);
-      const grossDeductions = valTax + valOtherDed;
-      const netPay = Math.max(0, calc.grossEarnings - grossDeductions);
 
-      // Update ringkasan formula di panel kiri
-      const fixedPct = (calc.fixedRatio * 100).toFixed(2);
-      const dailyPct = (calc.dailyRatio * 100).toFixed(2);
-      document.getElementById('attendanceFormulaSummary').innerHTML = `
-        <div>• <strong>Komponen Tetap</strong> (Gaji Dasar, Tj. Posisi, Tj. Rumah): dibayar <strong class="text-slate-900">${calc.fixedPaidDays} / ${calc.totalDays} hari</strong> (${fixedPct}%) — <em>Cuti/Sakit dibayar, Mangkir dipotong</em>.</div>
-        <div>• <strong>Tunjangan Harian</strong> (Tj. Transport &amp; Tj. Kehadiran): dibayar <strong class="text-slate-900">${calc.dailyPaidDays} / ${calc.totalDays} hari</strong> (${dailyPct}%) — <em>Cuti/Sakit &amp; Mangkir dipotong</em>.</div>
+      let pph21Deduction = 0;
+      let pph21RefundCredit = 0;
+      let taxDedLabel = '';
+      let taxDedSub = '';
+      let taxRefundSub = '';
+      let taxNoteHTML = '';
+
+      if (taxMode === 'TER') {
+        const terRate = getTerRate(periodWorkAndBenefitGross, ptkpMeta.category);
+        pph21Deduction = Math.round(periodWorkAndBenefitGross * terRate);
+        const pctStr = (terRate * 100).toFixed(2).replace('.', ',');
+
+        taxDedLabel = `PPh Pasal 21 (TER Kategori ${ptkpMeta.category})`;
+        taxDedSub = `Tarif Efektif ${pctStr}% × Bruto ${formatIDR(periodWorkAndBenefitGross)}`;
+
+        taxNoteHTML = `
+          <strong>Catatan Pajak PPh 21 (PP 58/2023 &amp; PMK 168/2023):</strong> Pemotongan bulan berjalan menggunakan Tarif Efektif Bulanan (TER Kategori ${ptkpMeta.category} — ${empPtkp}) sebesar <strong>${pctStr}%</strong> (${formatIDR(pph21Deduction)}). Karena karyawan bergabung pada <strong>${empJoinDate}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong> di 2026, tidak disetahunkan), apabila akumulasi bruto ${monthsWorkedYear} bulan masih di bawah PTKP Tahunan <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong>, maka pemotongan PPh 21 ini akan dikembalikan penuh (<em>tax refund</em>) pada rekonsiliasi masa pajak Desember 2026.
+        `;
+      } else if (taxMode === 'RECON') {
+        const priorGross = Math.max(0, parseFloat(document.getElementById('priorGrossAccum').value) || 0);
+        const priorTaxWithheld = Math.max(0, parseFloat(document.getElementById('priorTaxWithheld').value) || 0);
+
+        const totalAnnualGross = priorGross + periodWorkAndBenefitGross;
+        // Biaya Jabatan: 5% dari bruto, maksimal Rp 500.000 per bulan bekerja
+        const maxBiayaJabatan = 500000 * monthsWorkedYear;
+        const biayaJabatan = Math.min(maxBiayaJabatan, Math.round(totalAnnualGross * 0.05));
+        const netAnnualIncome = Math.max(0, totalAnnualGross - biayaJabatan);
+        const pkpAnnual = Math.max(0, netAnnualIncome - ptkpMeta.annualPtkp);
+        const annualTaxDue = calculatePasal17Tax(pkpAnnual);
+
+        const taxDiff = annualTaxDue - priorTaxWithheld;
+        if (taxDiff >= 0) {
+          pph21Deduction = taxDiff;
+          pph21RefundCredit = 0;
+        } else {
+          pph21Deduction = 0;
+          pph21RefundCredit = Math.abs(taxDiff);
+        }
+
+        taxDedLabel = `PPh Pasal 21 (Rekonsiliasi ${monthsWorkedYear} Bulan)`;
+        taxDedSub = `PPh Terutang Setahun: ${formatIDR(annualTaxDue)}`;
+        taxRefundSub = `Lebih Potong Nov (${formatIDR(priorTaxWithheld)}) − Terutang (${formatIDR(annualTaxDue)})`;
+
+        document.getElementById('reconPreviewSummary').innerHTML = `
+          Total Bruto ${monthsWorkedYear} Bln: <strong>${formatIDR(totalAnnualGross)}</strong> | Biaya Jabatan: <strong>${formatIDR(biayaJabatan)}</strong> | PTKP ${empPtkp}: <strong>${formatIDR(ptkpMeta.annualPtkp)}</strong> | PKP: <strong>${formatIDR(pkpAnnual)}</strong> | PPh Terutang Setahun: <strong>${formatIDR(annualTaxDue)}</strong> ${pph21RefundCredit > 0 ? `→ <span class="text-emerald-700 font-bold">Refund +${formatIDR(pph21RefundCredit)}</span>` : ''}
+        `;
+
+        taxNoteHTML = `
+          <strong>Rekonsiliasi PPh 21 Masa Pajak Terakhir (PMK 168/2023 Pasal 15 &amp; 21 — ${monthsWorkedYear} Bulan Kerja):</strong> Total bruto ${monthsWorkedYear} bulan (${formatIDR(totalAnnualGross)}) dikurangi Biaya Jabatan (${formatIDR(biayaJabatan)}) menghasilkan neto <strong>${formatIDR(netAnnualIncome)}</strong>, masih di bawah PTKP penuh <strong>${empPtkp} (${formatIDR(ptkpMeta.annualPtkp)})</strong> sehingga PKP = <strong>Rp 0</strong> dan PPh 21 terutang setahun = <strong>Rp 0</strong>. Kelebihan pemotongan PPh 21 masa sebelumnya sebesar <strong>${formatIDR(pph21RefundCredit)}</strong> dikreditkan kembali ke THP karyawan.
+        `;
+      } else {
+        const manualVal = Math.round(parseFloat(document.getElementById('manualTaxAmount').value) || 0);
+        if (manualVal >= 0) {
+          pph21Deduction = manualVal;
+          pph21RefundCredit = 0;
+        } else {
+          pph21Deduction = 0;
+          pph21RefundCredit = Math.abs(manualVal);
+        }
+
+        taxDedLabel = `PPh Pasal 21 (Penyesuaian Manual)`;
+        taxDedSub = `Status ${empPtkp} (TER Kategori ${ptkpMeta.category})`;
+        taxRefundSub = `Kredit / Pengembalian Pajak Manual`;
+
+        taxNoteHTML = `
+          <strong>Catatan Pajak PPh 21:</strong> Perhitungan PPh 21 disesuaikan secara manual dengan status PTKP <strong>${empPtkp}</strong> (masa kerja tahun berjalan <strong>${monthsWorkedYear} bulan</strong>, tidak disetahunkan sesuai ketentuan Wajib Pajak Dalam Negeri yang mulai bekerja di tengah tahun kalender).
+        `;
+      }
+
+      // 5. Total Gross, Deductions & Net THP
+      const totalGrossEarnings = periodWorkAndBenefitGross + pph21RefundCredit;
+      const totalDeductions = pph21Deduction + valOtherDed;
+      const netPay = Math.max(0, totalGrossEarnings - totalDeductions);
+
+      // 6. Update Tampilan Panel Kiri (Info Rumus)
+      const fixedPct = (fixedRatio * 100).toFixed(2);
+      const dailyPct = (dailyRatio * 100).toFixed(2);
+      document.getElementById('attendanceRuleInfo').innerHTML = `
+        <div>• <strong>Gaji Dasar, Tj. Posisi &amp; Tj. Rumah:</strong> dibayar <strong class="text-slate-900">${fixedPaidDays} / ${totalDays} hari</strong> (${fixedPct}%) — <em>Cuti/Sakit dibayar, Mangkir dipotong</em>.</div>
+        <div>• <strong>Tj. Transport &amp; Tj. Kehadiran:</strong> dibayar <strong class="text-slate-900">${dailyPaidDays} / ${totalDays} hari</strong> (${dailyPct}%) — <em>Cuti/Sakit &amp; Mangkir dipotong</em>.</div>
+        <div>• <strong>BPJS Kesehatan:</strong> dibayar <strong>Full (${formatIDR(valBpjsBen)})</strong> sebagai Benefit Mandiri.</div>
       `;
 
-      // Update header & identitas dokumen A4
+      // 7. Update Dokumen A4
       document.getElementById('docPeriodBadge').textContent = `Periode: ${payPeriod}`;
       document.getElementById('viewEmpName').textContent = empName;
       document.getElementById('viewEmpTitle').textContent = empTitle;
       document.getElementById('viewEmpId').textContent = empId;
-      document.getElementById('viewEmpPtkp').textContent = empPtkp;
+      document.getElementById('viewEmpNpwp').textContent = empNpwp || '-';
+      document.getElementById('viewEmpBank').textContent = empBank || '-';
       document.getElementById('viewPayPeriod').textContent = payPeriod;
+      document.getElementById('viewPayDate').textContent = payDate;
       document.getElementById('viewJoinDate').textContent = empJoinDate;
-      document.getElementById('viewEmpBank').textContent = empBank;
-      document.getElementById('viewRatioInfo').textContent = `${calc.fixedPaidDays} / ${calc.totalDays} Hari Kerja (${fixedPct}%)`;
+      document.getElementById('viewEmpPtkp').textContent = `${empPtkp} (TER Kategori ${ptkpMeta.category})`;
+      document.getElementById('viewMonthsWorked').textContent = `${monthsWorkedYear} Bulan (Tahun Berjalan)`;
 
-      // Update Strip Kehadiran
-      document.getElementById('stripTotalDays').textContent = `${calc.totalDays} Hari`;
-      document.getElementById('stripPresentDays').textContent = `${calc.presentDays} Hari`;
-      document.getElementById('stripLeaveDays').textContent = `${calc.leaveDays} Hari`;
-      document.getElementById('stripAbsentDays').textContent = `${calc.absentDays} Hari`;
-      document.getElementById('stripPlDays').textContent = `${calc.plDays} Hari`;
+      // Strip Kehadiran
+      document.getElementById('stripTotalDays').textContent = `${totalDays} Hari`;
+      document.getElementById('stripPresentDays').textContent = `${presentDays} Hari`;
+      document.getElementById('stripLeaveDays').textContent = `${leaveDays} Hari`;
+      document.getElementById('stripAbsentDays').textContent = `${absentDays} Hari`;
+      document.getElementById('stripPlDays').textContent = `${plDays} Hari`;
 
-      // Update Tabel Earnings & Benefits
-      document.getElementById('valBase').textContent = formatIDR(calc.valBase);
-      document.getElementById('subBase').textContent = `Full: ${formatIDR(calc.fullBase)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
+      // Earnings & Benefits
+      document.getElementById('valBase').textContent = formatIDR(valBase);
+      document.getElementById('subBase').textContent = `Full: ${formatIDR(fullBase)} (${fixedPaidDays}/${totalDays} hr)`;
 
-      document.getElementById('valPos').textContent = formatIDR(calc.valPos);
-      document.getElementById('subPos').textContent = `Full: ${formatIDR(calc.fullPos)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
+      document.getElementById('valPos').textContent = formatIDR(valPos);
+      document.getElementById('subPos').textContent = `Full: ${formatIDR(fullPos)} (${fixedPaidDays}/${totalDays} hr)`;
 
-      document.getElementById('valHousing').textContent = formatIDR(calc.valHousing);
-      document.getElementById('subHousing').textContent = `Full: ${formatIDR(calc.fullHousing)} (${calc.fixedPaidDays}/${calc.totalDays} hr)`;
+      document.getElementById('valHousing').textContent = formatIDR(valHousing);
+      document.getElementById('subHousing').textContent = `Full: ${formatIDR(fullHousing)} (${fixedPaidDays}/${totalDays} hr)`;
 
-      document.getElementById('valTrans').textContent = formatIDR(calc.valTrans);
-      document.getElementById('subTrans').textContent = `Full: ${formatIDR(calc.fullTrans)} (${calc.dailyPaidDays}/${calc.totalDays} hr hadir)`;
+      document.getElementById('valTrans').textContent = formatIDR(valTrans);
+      document.getElementById('subTrans').textContent = `Full: ${formatIDR(fullTrans)} (${dailyPaidDays}/${totalDays} hr hadir)`;
 
-      document.getElementById('valAtt').textContent = formatIDR(calc.valAtt);
-      document.getElementById('subAtt').textContent = `Full: ${formatIDR(calc.fullAtt)} (${calc.dailyPaidDays}/${calc.totalDays} hr hadir)`;
+      document.getElementById('valAtt').textContent = formatIDR(valAtt);
+      document.getElementById('subAtt').textContent = `Full: ${formatIDR(fullAtt)} (${dailyPaidDays}/${totalDays} hr hadir)`;
 
-      document.getElementById('valBpjsBen').textContent = formatIDR(calc.valBpjsBen);
-      document.getElementById('subBpjsBen').textContent = calc.isProrataBpjs
-        ? `Benefit Mandiri Prorata (${calc.fixedPaidDays}/${calc.totalDays} hr)`
-        : `Benefit Kepesertaan Mandiri (Full ${formatIDR(calc.fullBpjsBen)})`;
+      document.getElementById('valBpjsBen').textContent = formatIDR(valBpjsBen);
 
-      // Update Deductions
-      document.getElementById('valTax').textContent = formatIDR(valTax);
-      const terCategory = ['TK/0', 'TK/1', 'K/0'].includes(empPtkp) ? 'TER Kategori A' : 'TER Kategori B';
-      document.getElementById('subTax').textContent = `Status ${empPtkp} (${terCategory})`;
+      // Baris Pengembalian Pajak (Refund)
+      const refundRow = document.getElementById('taxRefundRow');
+      if (pph21RefundCredit > 0) {
+        refundRow.classList.remove('hidden');
+        document.getElementById('valTaxRefund').textContent = formatIDR(pph21RefundCredit);
+        document.getElementById('subTaxRefund').textContent = taxRefundSub;
+      } else {
+        refundRow.classList.add('hidden');
+      }
+
+      // Deductions
+      document.getElementById('lblTaxDed').textContent = taxDedLabel;
+      document.getElementById('subTaxDed').textContent = taxDedSub;
+      document.getElementById('valTaxDed').textContent = formatIDR(pph21Deduction);
       document.getElementById('valOtherDed').textContent = formatIDR(valOtherDed);
 
-      // Update Totals & THP
-      document.getElementById('valGrossEarnings').textContent = formatIDR(calc.grossEarnings);
-      document.getElementById('valGrossDeductions').textContent = formatIDR(grossDeductions);
+      // Totals & Terbilang
+      document.getElementById('valGrossEarnings').textContent = formatIDR(totalGrossEarnings);
+      document.getElementById('valGrossDeductions').textContent = formatIDR(totalDeductions);
       document.getElementById('valNetPay').textContent = formatIDR(netPay);
 
       const words = terbilang(netPay).replace(/\s+/g, ' ').trim();
       document.getElementById('valTerbilang').textContent = `Terbilang: ${words ? words + ' Rupiah' : 'Nol Rupiah'}`;
 
-      // Update Kotak Hak PL / LP
-      document.getElementById('plEntitlementText').innerHTML = `
-        Karyawan berhak atas <strong>${calc.plDays} hari Pengganti Libur (PL/LP)</strong> pada bulan berjalan atas kehadiran di hari akhir pekan (weekend).
-      `;
+      // Kotak Hak Pengganti Libur (PL) — tampil bila PL > 0
+      const plBox = document.getElementById('plEntitlementBox');
+      if (plDays > 0) {
+        plBox.classList.remove('hidden');
+        document.getElementById('plEntitlementText').innerHTML = `Karyawan berhak atas sejumlah <strong>${plDays} hari Pengganti Libur (PL)</strong> di bulan ini atas penugasan/kehadiran kerja di hari akhir pekan (weekend).`;
+      } else {
+        plBox.classList.add('hidden');
+      }
 
-      // Update Catatan Kaki
+      // Catatan Pajak & Aturan Prorata
+      document.getElementById('taxExplanationBox').innerHTML = taxNoteHTML;
       document.getElementById('docFootnote').innerHTML = `
-        <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (${calc.fixedPaidDays}/${calc.totalDays} hari) serta dipotong proporsional atas mangkir (${calc.absentDays} hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir (${calc.dailyPaidDays}/${calc.totalDays} hari; cuti/sakit &amp; mangkir memotong tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan sebagai benefit mandiri.
+        <strong>Keterangan Perhitungan:</strong> Gaji Dasar, Tunjangan Posisi, dan Tunjangan Rumah dibayarkan proporsional untuk hari hadir &amp; cuti/sakit (${fixedPaidDays}/${totalDays} hari) serta dipotong proporsional atas mangkir (${absentDays} hari). Tunjangan Transport dan Tunjangan Kehadiran dibayarkan berdasarkan hari hadir (${dailyPaidDays}/${totalDays} hari; cuti/sakit &amp; mangkir memotong tunjangan harian ini). Tunjangan BPJS Kesehatan dibayarkan penuh sebagai benefit kepesertaan mandiri.
       `;
 
-      // Update Blok Tanda Tangan
+      // Tanda Tangan
       document.getElementById('viewApproverName').textContent = approverName;
       document.getElementById('viewReceiverName').textContent = empName;
       document.getElementById('viewReceiverTitle').textContent = empTitle;
     }
 
-    // Upload Logo Kustom
+    // Upload & Reset Logo
     function handleLogoUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -878,16 +1050,36 @@
       showToast('Logo dikembalikan ke ./logo-aeer.jpg.');
     }
 
-    // Reset semua input ke data awal
+    // Simulasi Cepat Desember 2026 (Gaji Full + Pengembalian Lebih Potong Pajak November)
+    function applyDecemberPreset() {
+      document.getElementById('payPeriod').value = '26 November – 25 Desember 2026';
+      document.getElementById('payDate').value = '25 Desember 2026';
+      document.getElementById('totalDays').value = '22';
+      document.getElementById('presentDays').value = '22';
+      document.getElementById('leaveDays').value = '0';
+      document.getElementById('absentDays').value = '0';
+      document.getElementById('monthsWorkedYear').value = '2';
+
+      document.getElementById('taxMode').value = 'RECON';
+      document.getElementById('priorGrossAccum').value = '19536957';
+      document.getElementById('priorTaxWithheld').value = '1363478';
+
+      onTaxModeChange();
+      showToast('Simulasi Desember 2026 (Rekonsiliasi 2 Bulan & Refund PPh 21) diterapkan.');
+    }
+
+    // Reset Default (November 2026)
     function resetDefaults() {
       document.getElementById('empName').value = 'Yohan Kurniawan';
       document.getElementById('empTitle').value = 'Senior Operation and People Manager';
-      document.getElementById('empId').value = 'AEER-2026-011';
-      document.getElementById('empPtkp').value = 'K/3';
+      document.getElementById('empId').value = 'AEER-2026-1106';
+      document.getElementById('empNpwp').value = '';
+      document.getElementById('empBank').value = 'BCA - Yohan Kurniawan';
       document.getElementById('empJoinDate').value = '6 November 2026';
       document.getElementById('payPeriod').value = '26 Oktober – 25 November 2026';
-      document.getElementById('empBank').value = 'BCA - a.n. Yohan Kurniawan';
-      document.getElementById('approverName').value = 'Pius Ginting';
+      document.getElementById('payDate').value = '25 November 2026';
+      document.getElementById('empPtkp').value = 'K/3';
+      document.getElementById('monthsWorkedYear').value = '2';
 
       document.getElementById('totalDays').value = '23';
       document.getElementById('presentDays').value = '14';
@@ -901,16 +1093,19 @@
       document.getElementById('transAllowance').value = '1500000';
       document.getElementById('attAllowance').value = '1500000';
       document.getElementById('bpjsBenefit').value = '150000';
-      document.getElementById('prorataBpjsBenefit').checked = false;
 
-      document.getElementById('autoTax').checked = true;
+      document.getElementById('taxMode').value = 'TER';
+      document.getElementById('priorGrossAccum').value = '19536957';
+      document.getElementById('priorTaxWithheld').value = '1363478';
+      document.getElementById('manualTaxAmount').value = '0';
       document.getElementById('otherDeduction').value = '0';
+      document.getElementById('approverName').value = 'Pius Ginting';
 
-      onFormulaInputChange();
-      showToast('Data berhasil dikembalikan ke pengaturan default.');
+      onTaxModeChange();
+      showToast('Data dikembalikan ke pengaturan default November 2026.');
     }
 
-    // Download file index.html siap upload ke GitHub Pages
+    // Download index.html
     function downloadSourceHTML() {
       const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
@@ -922,10 +1117,10 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('File index.html berhasil diunduh! Siap di-upload ke GitHub Pages.');
+      showToast('File index.html berhasil diunduh!');
     }
 
-    // Toast notification ringan
+    // Toast Notification
     function showToast(msg) {
       const banner = document.getElementById('toastBanner');
       document.getElementById('toastMessage').textContent = msg;
@@ -936,9 +1131,9 @@
       }, 3500);
     }
 
-    // Inisialisasi awal
+    // Inisialisasi saat halaman dimuat
     window.addEventListener('DOMContentLoaded', () => {
-      onFormulaInputChange();
+      onTaxModeChange();
     });
   </script>
 </body>
